@@ -4,7 +4,7 @@ from robotics.envs import fetch_env
 
 
 # Ensure we get the path separator correct on windows
-MODEL_XML_PATH = os.path.join("fetch", "pick_and_place.xml")
+MODEL_XML_PATH = os.path.join("fetch", "complete.xml")
 
 
 class FetchPickAndPlaceEnv(fetch_env.FetchEnv, utils.EzPickle):

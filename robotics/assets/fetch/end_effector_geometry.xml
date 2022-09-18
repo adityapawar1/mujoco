@@ -1,0 +1,42 @@
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <mujoco>
+ 
+ 
+            <body childclass="robot0:link" name="Base_link_0" pos="0 0 0">
+                <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
+                <geom pos="0 0.008 0" size="0.0001 0.0001 0.0001" type="box" name="robot0:Base_link_0" material="robot0:gripper_finger_mat" condim="4" friction="1 1 1"></geom>
+                
+            <body childclass="robot0:hingePart" name="Base_link_0_joint_0" pos="0 0.0001 0">
+                <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
+                <joint axis="0 -1 0" name="robot0:Base_link_0_joint_0" range="-1 1"></joint>
+                <geom pos="0 0.008 0" size="0.01 0.05 0.01" type="box" name="robot0:Base_link_0_joint_0" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                
+            <body childclass="robot0:hingePart" name="Base_link_0_joint_0_joint_0" pos="0 0.05 0">
+                <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
+                <joint axis="0 -1 0" name="robot0:Base_link_0_joint_0_joint_0" range="-1 1"></joint>
+                <geom pos="0 0.008 0" size="0.01 0.05 0.01" type="box" name="robot0:Base_link_0_joint_0_joint_0" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                
+            <body childclass="robot0:slidePart" name="Base_link_0_joint_0_joint_0_joint_0" pos="0 0 0.01">
+                <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
+                <joint axis="0 -1 0" name="robot0:Base_link_0_joint_0_joint_0_joint_0" range="-1 1"></joint>
+                <geom pos="0 0.008 0" size="0.05 0.05 0.01" type="box" name="robot0:Base_link_0_joint_0_joint_0_joint_0" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                
+            </body>
+        
+            </body>
+        
+            </body>
+        
+
+            <body childclass="robot0:hingePart" name="Base_link_0_joint_1" pos="0 0.0001 0">
+                <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
+                <joint axis="0 -1 0" name="robot0:Base_link_0_joint_1" range="-1 1"></joint>
+                <geom pos="0 0.008 0" size="0.01 0.05 0.01" type="box" name="robot0:Base_link_0_joint_1" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                
+            </body>
+        
+            </body>
+         
+ 
+    </mujoco>

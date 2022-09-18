@@ -45,7 +45,7 @@
     </equality>
     
     <contact>
-        <exclude body1="robot0:r_gripper_finger_link" body2="robot0:l_gripper_finger_link"></exclude>
+        <!-- <exclude body1="robot0:r_gripper_finger_link" body2="robot0:a_gripper_finger_link"></exclude> -->
         <exclude body1="robot0:torso_lift_link" body2="robot0:torso_fixed_link"></exclude>
         <exclude body1="robot0:torso_lift_link" body2="robot0:shoulder_pan_link"></exclude>
     </contact>
@@ -55,10 +55,29 @@
             <geom margin="0.001" material="robot0:geomMat" rgba="1 1 1 1" solimp="0.99 0.99 0.01" solref="0.01 1" type="mesh" user="0"></geom>
             <joint armature="1" damping="50" frictionloss="0" stiffness="0"></joint>
             
-            <default class="robot0:fetchGripper">
+            <default class="robot0:link">
+                <geom condim="4" margin="0.001" type="box" user="0" rgba="0.356 0.361 0.376 1.0"></geom>
+            </default>
+
+            <default class="robot0:slidePart">
                 <geom condim="4" margin="0.001" type="box" user="0" rgba="0.356 0.361 0.376 1.0"></geom>
                 <joint armature="100" damping="1000" limited="true" solimplimit="0.99 0.999 0.01" solreflimit="0.01 1" type="slide"></joint>
             </default>
+
+            <default class="robot0:hingePart">
+                <geom condim="4" margin="0.001" type="box" user="0" rgba="0.356 0.361 0.376 1.0"></geom>
+                <joint armature="100" damping="1000" limited="true" solimplimit="0.99 0.999 0.01" solreflimit="0.01 1" type="hinge"></joint>
+            </default>
+
+            <!-- <default class="robot0:freePart"> -->
+            <!--     <geom condim="4" margin="0.001" type="box" user="0" rgba="0.356 0.361 0.376 1.0"></geom> -->
+            <!--     <joint armature="100" damping="1000" limited="true" solimplimit="0.99 0.999 0.01" solreflimit="0.01 1" type="free"></joint> -->
+            <!-- </default> -->
+            <!---->
+            <!-- <default class="robot0:ballPart"> -->
+            <!--     <geom condim="4" margin="0.001" type="box" user="0" rgba="0.356 0.361 0.376 1.0"></geom> -->
+            <!--     <joint armature="100" damping="1000" limited="true" solimplimit="0.99 0.999 0.01" solreflimit="0.01 1" type="ball"></joint> -->
+            <!-- </default> -->
 
             <default class="robot0:grey">
                 <geom rgba="0.356 0.361 0.376 1.0"></geom>

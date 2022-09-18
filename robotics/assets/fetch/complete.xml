@@ -32,7 +32,7 @@
 	<actuator>
 	    <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="robot0:slide0" gear="150"/>
     	<motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="robot0:slide1" gear="150"/>
-		<position ctrllimited="true" ctrlrange="0 0.2" joint="robot0:l_gripper_finger_joint" kp="30000" name="robot0:l_gripper_finger_joint" user="1"></position>
-		<position ctrllimited="true" ctrlrange="0 0.2" joint="robot0:r_gripper_finger_joint" kp="30000" name="robot0:r_gripper_finger_joint" user="1"></position>
+      <include file="end_effector_actuator.xml"></include>
 	</actuator>
 </mujoco>
+
