@@ -3,6 +3,7 @@ import numpy as np
 from robotics.envs import robot_env
 from robotics.envs import rotations, utils
 
+
 def goal_distance(goal_a, goal_b):
     assert goal_a.shape == goal_b.shape
     return np.linalg.norm(goal_a - goal_b, axis=-1)
@@ -25,6 +26,7 @@ class FetchEnv(robot_env.RobotEnv):
         distance_threshold,
         initial_qpos,
         reward_type,
+        n_actions
     ):
         """Initializes a new Fetch environment.
         Args:
@@ -54,7 +56,7 @@ class FetchEnv(robot_env.RobotEnv):
         super(FetchEnv, self).__init__(
             model_path=model_path,
             n_substeps=n_substeps,
-            n_actions=4,
+            n_actions=n_actions,
             initial_qpos=initial_qpos,
         )
 
@@ -79,24 +81,45 @@ class FetchEnv(robot_env.RobotEnv):
             self.sim.forward()
 
     def _set_action(self, action):
-        assert action.shape == (4,) # pos_ctrl(3), gripper_ctrl(1)
+        assert action.shape == (2,)  # z_ctrl(1), gripper_ctrl(1)
         action = (
             action.copy()
         )  # ensure that we don't change the action outside of this scope
-        pos_ctrl, gripper_ctrl = action[:3], action[3]
+        z_ctrl, gripper_ctrl = action[0], action[1]
 
-        pos_ctrl *= 0.05  # limit maximum change in position
+        z_ctrl *= 0.05  # limit movement speed
+
         rot_ctrl = [
             1.0,
             0.0,
             1.0,
             0.0,
         ]  # fixed rotation of the end effector, expressed as a quaternion
-        gripper_ctrl = np.array([gripper_ctrl, gripper_ctrl]) 
+        gripper_ctrl = np.array([gripper_ctrl, gripper_ctrl])
         assert gripper_ctrl.shape == (2,)
         if self.block_gripper:
             gripper_ctrl = np.zeros_like(gripper_ctrl)
-        action = np.concatenate([pos_ctrl, rot_ctrl, gripper_ctrl])
+
+        # we only want to control the z direction
+        # so "help" the robot be above the object
+        object_pos = self.sim.data.get_site_xpos("object0")
+        grip_pos = self.sim.data.get_site_xpos("robot0:grip")
+        delta_pos = object_pos - grip_pos 
+
+        # position * dt = velocity
+        vel = delta_pos * self.sim.nsubsteps * self.sim.model.opt.timestep
+
+        action = np.concatenate(
+            [
+                [
+                    vel[0],
+                    vel[1],
+                    z_ctrl
+                ],
+                rot_ctrl,
+                gripper_ctrl
+            ]
+        )
 
         # Apply action to simulation.
         utils.ctrl_set_action(self.sim, action)
