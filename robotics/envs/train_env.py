@@ -31,6 +31,6 @@ class TrainEnv(fetch_env.FetchEnv, utils.EzPickle):
             distance_threshold=0.05,
             initial_qpos=initial_qpos,
             reward_type=reward_type,
-            gripper_joints=["Base/0/0j"]
+            gripper_joints=["Base/0/0j", "Base/0/0j/0j", "Base/0/0j/0j/0j", "Base/0/1j", "Base/0/1j/0j", "Base/0/1j/0j/0j"]
         )
         utils.EzPickle.__init__(self, reward_type=reward_type)

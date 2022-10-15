@@ -7,19 +7,47 @@
                 <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
                 <geom pos="0 0 0" size="0.0001 0.0001 0.0001" type="box" name="robot0:Base/0" material="robot0:gripper_finger_mat" condim="4" friction="1 1 1"></geom>
                 
-            <body childclass="robot0:slidePart" name="Base/0/0j" pos="0 0 0.0001">
+            <body childclass="robot0:slidePart" name="Base/0/0j" pos="0 0.0001 0">
                 <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
                 <joint axis="0 -1 0" name="robot0:Base/0/0j" range="-0.15 0.15"></joint>
-                <geom pos="0 0.01 0" size="0.05 0.015 0.05" type="box" name="robot0:Base/0/0j" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                <geom pos="0.0006 0.0126 0.0086" size="0.0091 0.0271 0.0221" type="box" name="robot0:Base/0/0j" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
                 
+            <body childclass="robot0:hingePart" name="Base/0/0j/0j" pos="0.0091 0 0">
+                <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
+                <joint axis="0 -1 0" name="robot0:Base/0/0j/0j" range="-0.75 0.75"></joint>
+                <geom pos="0.0421 0.0381 0.0331" size="0.0246 0.0261 0.0231" type="box" name="robot0:Base/0/0j/0j" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                
+            <body childclass="robot0:hingePart" name="Base/0/0j/0j/0j" pos="0.0246 0 0">
+                <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
+                <joint axis="0 -1 0" name="robot0:Base/0/0j/0j/0j" range="-0.75 0.75"></joint>
+                <geom pos="0.0126 0.0371 0.0106" size="0.0026 0.0426 0.0451" type="box" name="robot0:Base/0/0j/0j/0j" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                
+            </body>
+        
+            </body>
+        
             </body>
         
 
             <body childclass="robot0:slidePart" name="Base/0/1j" pos="0 0 0.0001">
                 <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
                 <joint axis="0 -1 0" name="robot0:Base/0/1j" range="-0.15 0.15"></joint>
-                <geom pos="0 -0.01 0" size="0.05 0.015 0.05" type="box" name="robot0:Base/0/1j" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                <geom pos="0.0261 0.0396 0.0376" size="0.0291 0.0321 0.0136" type="box" name="robot0:Base/0/1j" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
                 
+            <body childclass="robot0:slidePart" name="Base/0/1j/0j" pos="0.0291 0 0">
+                <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
+                <joint axis="0 -1 0" name="robot0:Base/0/1j/0j" range="-0.15 0.15"></joint>
+                <geom pos="0.0366 0.0211 0.0141" size="0.0101 0.0436 0.0441" type="box" name="robot0:Base/0/1j/0j" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                
+            <body childclass="robot0:hingePart" name="Base/0/1j/0j/0j" pos="0 0 0.0441">
+                <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
+                <joint axis="0 -1 0" name="robot0:Base/0/1j/0j/0j" range="-0.75 0.75"></joint>
+                <geom pos="0.0146 0.0031 0.0466" size="0.0366 0.0386 0.0111" type="box" name="robot0:Base/0/1j/0j/0j" material="robot0:gripper_finger_mat" condim="4" friction="1.0 1.0 1.0"></geom>
+                
+            </body>
+        
+            </body>
+        
             </body>
         
             </body>

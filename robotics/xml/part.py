@@ -15,6 +15,12 @@ class Vector3:
     y: float
     z: float
 
+    def to_attribute(self) -> str:
+        return f"{round(self.x, 4)} {round(self.y, 4)} {round(self.z, 4)}"
+
+    def __str__(self) -> str:
+        return f"({round(self.x, 4)}, {round(self.y, 4)}, {round(self.z, 4)})"
+
 
 @dataclass()
 class Size(Vector3):
@@ -53,3 +59,9 @@ class MuJoCoPart:
 
     def set_parent(self, parent, idx):
         pass
+
+    def tree_representation(self, depth=0):
+        tab_depth = r"   " * depth
+        children_tree = "".join([f"{tab_depth}├─ {child.tree_representation(depth=depth+1)}" for child in self.children])
+        tree = f"{self.name()}: Size={self.size}, Pos={self.position}\n{children_tree}"
+        return tree
