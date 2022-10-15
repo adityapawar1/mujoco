@@ -1,7 +1,7 @@
 import gym
 import robotics
 # env = gym.make('UR5Env-v0')
-env = gym.make('PickPlace-v0')
+env = gym.make('EndEffectorEnv-v0')
 env.reset()
 
 for i in range(300):

@@ -11,16 +11,16 @@ class JointType(Enum):
 
 @dataclass()
 class Joint(MuJoCoPart):
-    range: int
+    range: float
     joint_type: JointType
     parent: MuJoCoPart | None = None
     idx: int = 0
 
     def name(self):
         if self.parent is None:
-            return f"Base_joint_{self.idx}"
+            return f"Base/{self.idx}"
         else:
-            return f"{self.parent.name()}_joint_{self.idx}"
+            return f"{self.parent.name()}/{self.idx}j"
 
     def set_parent(self, parent: MuJoCoPart, idx: int):
         self.parent = parent
@@ -46,7 +46,7 @@ class Joint(MuJoCoPart):
             <body childclass="robot0:{self.joint_type.value}" name="{self.name()}" pos="{self.find_attachment_position()}">
                 <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
                 <joint axis="0 -1 0" name="robot0:{self.name()}" range="{-self.range} {self.range}"></joint>
-                <geom pos="0 0.008 0" size="{self.size.x} {self.size.y} {self.size.z}" type="box" name="robot0:{self.name()}" material="robot0:gripper_finger_mat" condim="4" friction="{self.friction} {self.friction} {self.friction}"></geom>
+                <geom pos="{self.position.x} {self.position.y} {self.position.z}" size="{self.size.x} {self.size.y} {self.size.z}" type="box" name="robot0:{self.name()}" material="robot0:gripper_finger_mat" condim="4" friction="{self.friction} {self.friction} {self.friction}"></geom>
                 {child_geometry}
             </body>
         """

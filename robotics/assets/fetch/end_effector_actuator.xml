@@ -3,14 +3,10 @@
     <mujoco>
  
  
-            <position ctrllimited="true" ctrlrange="-1 1" joint="robot0:Base_link_0_joint_0" kp="30000" name="robot0:Base_link_0_joint_0" user="1"></position>
-        
-            <position ctrllimited="true" ctrlrange="-1 1" joint="robot0:Base_link_0_joint_0_joint_0" kp="30000" name="robot0:Base_link_0_joint_0_joint_0" user="1"></position>
-        
-            <position ctrllimited="true" ctrlrange="-1 1" joint="robot0:Base_link_0_joint_0_joint_0_joint_0" kp="30000" name="robot0:Base_link_0_joint_0_joint_0_joint_0" user="1"></position>
+            <position ctrllimited="true" ctrlrange="-0.15 0.15" joint="robot0:Base/0/0j" kp="30000" name="robot0:Base/0/0j" user="1"></position>
         
 
-            <position ctrllimited="true" ctrlrange="-1 1" joint="robot0:Base_link_0_joint_1" kp="30000" name="robot0:Base_link_0_joint_1" user="1"></position>
+            <position ctrllimited="true" ctrlrange="-0.15 0.15" joint="robot0:Base/0/1j" kp="30000" name="robot0:Base/0/1j" user="1"></position>
          
  
     </mujoco>

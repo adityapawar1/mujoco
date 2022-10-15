@@ -7,7 +7,9 @@ from robotics.envs import fetch_env
 MODEL_XML_PATH = os.path.join("fetch", "complete.xml")
 
 
-class FetchPickAndPlaceEnv(fetch_env.FetchEnv, utils.EzPickle):
+class TrainEnv(fetch_env.FetchEnv, utils.EzPickle):
+    """A class for training a member of the genetic algorithm population"""
+
     def __init__(self, reward_type="dense"):
         initial_qpos = {
             "robot0:slide0": 0.405,
@@ -29,6 +31,6 @@ class FetchPickAndPlaceEnv(fetch_env.FetchEnv, utils.EzPickle):
             distance_threshold=0.05,
             initial_qpos=initial_qpos,
             reward_type=reward_type,
-            n_actions=2
+            gripper_joints=["Base/0/0j"]
         )
         utils.EzPickle.__init__(self, reward_type=reward_type)

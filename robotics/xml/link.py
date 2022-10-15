@@ -10,9 +10,9 @@ class Link(MuJoCoPart):
 
     def name(self):
         if self.parent is None:
-            return f"Base_link_{self.idx}"
+            return f"Base/{self.idx}"
         else:
-            return f"{self.parent.name()}_joint_{self.idx}"
+            return f"{self.parent.name()}/{self.idx}j"
 
     def set_parent(self, parent: MuJoCoPart, idx: int):
         if parent == self:
@@ -39,7 +39,7 @@ class Link(MuJoCoPart):
         return f"""
             <body childclass="robot0:link" name="{self.name()}" pos="{self.find_attachment_position()}">
                 <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
-                <geom pos="0 0.008 0" size="{self.size.x} {self.size.y} {self.size.z}" type="box" name="robot0:{self.name()}" material="robot0:gripper_finger_mat" condim="4" friction="{self.friction} {self.friction} {self.friction}"></geom>
+                <geom pos="{self.position.x} {self.position.y} {self.position.z}" size="{self.size.x} {self.size.y} {self.size.z}" type="box" name="robot0:{self.name()}" material="robot0:gripper_finger_mat" condim="4" friction="{self.friction} {self.friction} {self.friction}"></geom>
                 {child_geometry}
             </body>
         """

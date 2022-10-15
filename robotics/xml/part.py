@@ -10,14 +10,24 @@ class Attachment(Enum):
 
 
 @dataclass()
-class Size:
+class Vector3:
     x: float
     y: float
     z: float
 
+
+@dataclass()
+class Size(Vector3):
     @staticmethod
     def zero():
         return Size(0.0001, 0.0001, 0.0001)
+
+
+@dataclass()
+class Position(Vector3):
+    @staticmethod
+    def zero():
+        return Position(0, 0, 0)
 
 
 @dataclass(kw_only=True)
@@ -25,6 +35,7 @@ class MuJoCoPart:
     size: Size
     attachment: Attachment
     friction: float
+    position: Position
     children: list = field(default_factory=list)
 
     def add_child(self, child):

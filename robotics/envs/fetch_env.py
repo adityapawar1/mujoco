@@ -26,7 +26,7 @@ class FetchEnv(robot_env.RobotEnv):
         distance_threshold,
         initial_qpos,
         reward_type,
-        n_actions
+        gripper_joints
     ):
         """Initializes a new Fetch environment.
         Args:
@@ -42,6 +42,7 @@ class FetchEnv(robot_env.RobotEnv):
             distance_threshold (float): the threshold after which a goal is considered achieved
             initial_qpos (dict): a dictionary of joint names and values that define the initial configuration
             reward_type ('sparse' or 'dense'): the reward type, i.e. sparse or dense
+            gripper_joints: the joint names of the grippers in an array
         """
         self.gripper_extra_height = gripper_extra_height
         self.block_gripper = block_gripper
@@ -52,11 +53,13 @@ class FetchEnv(robot_env.RobotEnv):
         self.target_range = target_range
         self.distance_threshold = distance_threshold
         self.reward_type = reward_type
+        self.gripper_joints = gripper_joints
+        self.gripper_joint_count = len(gripper_joints)
 
         super(FetchEnv, self).__init__(
             model_path=model_path,
             n_substeps=n_substeps,
-            n_actions=n_actions,
+            n_actions=1 + self.gripper_joint_count,
             initial_qpos=initial_qpos,
         )
 
@@ -81,11 +84,11 @@ class FetchEnv(robot_env.RobotEnv):
             self.sim.forward()
 
     def _set_action(self, action):
-        assert action.shape == (2,)  # z_ctrl(1), gripper_ctrl(1)
+        assert action.shape == (1+self.gripper_joint_count,)  # z_ctrl(1), gripper_ctrl(n-1)
         action = (
             action.copy()
         )  # ensure that we don't change the action outside of this scope
-        z_ctrl, gripper_ctrl = action[0], action[1]
+        z_ctrl, gripper_ctrl = action[0], action[1:]
 
         z_ctrl *= 0.05  # limit movement speed
 
@@ -95,8 +98,7 @@ class FetchEnv(robot_env.RobotEnv):
             1.0,
             0.0,
         ]  # fixed rotation of the end effector, expressed as a quaternion
-        gripper_ctrl = np.array([gripper_ctrl, gripper_ctrl])
-        assert gripper_ctrl.shape == (2,)
+
         if self.block_gripper:
             gripper_ctrl = np.zeros_like(gripper_ctrl)
 
@@ -104,7 +106,7 @@ class FetchEnv(robot_env.RobotEnv):
         # so "help" the robot be above the object
         object_pos = self.sim.data.get_site_xpos("object0")
         grip_pos = self.sim.data.get_site_xpos("robot0:grip")
-        delta_pos = object_pos - grip_pos 
+        delta_pos = object_pos - grip_pos
 
         # position * dt = velocity
         vel = delta_pos * self.sim.nsubsteps * self.sim.model.opt.timestep
@@ -122,8 +124,16 @@ class FetchEnv(robot_env.RobotEnv):
         )
 
         # Apply action to simulation.
+        self.set_gripper(gripper_ctrl)
         utils.ctrl_set_action(self.sim, action)
         utils.mocap_set_action(self.sim, action)
+
+    def set_gripper(self, gripper_ctrl):
+        assert(self.gripper_joint_count == len(gripper_ctrl))
+
+        for action, joint in zip(gripper_ctrl, self.gripper_joints):
+            # set action in simulation
+            self.sim.data.set_joint_qvel(f"robot0:{joint}", action * .5)
 
     def _get_obs(self):
         # positions
