@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 
-from robotics.xml.part import MuJoCoPart, Attachment
+from robotics.mujoco_xml.part import MuJoCoPart, Attachment
 
 
 @dataclass()
 class Link(MuJoCoPart):
     """Defines a MuJoCo link"""
+
     parent: MuJoCoPart | None = None
     idx: int = 0
 
@@ -36,9 +37,7 @@ class Link(MuJoCoPart):
 
     def build_geometry(self) -> str:
         """Creates the geometry XML for this link"""
-        child_geometry = "\n".join(
-            [child.build_geometry() for child in self.children]
-        )
+        child_geometry = "\n".join([child.build_geometry() for child in self.children])
 
         return f"""
             <body childclass="robot0:link" name="{self.name()}" pos="{self.find_attachment_position()}">
@@ -52,8 +51,7 @@ class Link(MuJoCoPart):
         """Creates the actuator XML for this link"""
         child_actuators = "\n".join(
             filter(
-                lambda s: s != "",
-                [child.build_actuator() for child in self.children]
+                lambda s: s != "", [child.build_actuator() for child in self.children]
             )
         )
 

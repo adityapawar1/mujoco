@@ -1,8 +1,8 @@
 import os
 
-from robotics.xml.joint import Joint, JointType
-from robotics.xml.link import Link
-from robotics.xml.part import Attachment, MuJoCoPart, Position, Size
+from robotics.mujoco_xml.joint import Joint, JointType
+from robotics.mujoco_xml.link import Link
+from robotics.mujoco_xml.part import Attachment, MuJoCoPart, Position, Size
 
 HEADER = """
     <?xml version="1.0" encoding="utf-8"?>
@@ -14,15 +14,16 @@ FOOTER = """
 """
 
 
-class EndEffector():
+class EndEffector:
     """A class to store the tree of MuJoCo parts making up an entire end effector"""
+
     base_link: MuJoCoPart = Link(
         parent=None,
         position=Position.zero(),
         idx=0,
         size=Size.zero(),
         attachment=Attachment.X,
-        friction=1
+        friction=1,
     )
 
     def __init__(self, parts: list[MuJoCoPart]) -> None:
@@ -35,10 +36,16 @@ class EndEffector():
         geometry = self.base_link.build_geometry()
         actuator = self.base_link.build_actuator()
 
-        with open(os.path.join("robotics", "assets", "fetch", "end_effector_geometry.xml"), 'w') as file:
+        with open(
+            os.path.join("robotics", "assets", "fetch", "end_effector_geometry.xml"),
+            "w",
+        ) as file:
             file.write(f"{HEADER} \n {geometry} \n {FOOTER}")
 
-        with open(os.path.join("robotics", "assets", "fetch", "end_effector_actuator.xml"), 'w') as file:
+        with open(
+            os.path.join("robotics", "assets", "fetch", "end_effector_actuator.xml"),
+            "w",
+        ) as file:
             file.write(f"{HEADER} \n {actuator} \n {FOOTER}")
 
     def ga_string(self) -> str:
@@ -55,7 +62,7 @@ if __name__ == "__main__":
         joint_type=JointType.SLIDE,
         size=Size(0.05, 0.015, 0.05),
         attachment=Attachment.Z,
-        friction=1.0
+        friction=1.0,
     )
     joint2 = Joint(
         range=0.15,
@@ -63,7 +70,7 @@ if __name__ == "__main__":
         joint_type=JointType.SLIDE,
         size=Size(0.05, 0.015, 0.05),
         attachment=Attachment.Z,
-        friction=1.0
+        friction=1.0,
     )
     joint3 = Joint(
         range=0.15,
@@ -71,7 +78,7 @@ if __name__ == "__main__":
         joint_type=JointType.SLIDE,
         size=Size(0.05, 0.015, 0.05),
         attachment=Attachment.Z,
-        friction=1.0
+        friction=1.0,
     )
 
     joint1.add_child(joint3)

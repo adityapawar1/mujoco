@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from enum import Enum
 
-from robotics.xml.part import MuJoCoPart, Attachment
+from robotics.mujoco_xml.part import MuJoCoPart, Attachment
 
 
 class JointType(Enum):
     """Defines the way the joint rotates (slide/hinge)"""
+
     SLIDE = "slidePart"
     HINGE = "hingePart"
 
@@ -13,6 +14,7 @@ class JointType(Enum):
 @dataclass()
 class Joint(MuJoCoPart):
     """Defines a MuJoCo Joint"""
+
     range: float
     joint_type: JointType
     parent: MuJoCoPart | None = None
@@ -43,9 +45,7 @@ class Joint(MuJoCoPart):
 
     def build_geometry(self) -> str:
         """Creates the geometry XML for this joint"""
-        child_geometry = "\n".join(
-            [child.build_geometry() for child in self.children]
-        )
+        child_geometry = "\n".join([child.build_geometry() for child in self.children])
 
         return f"""
             <body childclass="robot0:{self.joint_type.value}" name="{self.name()}" pos="{self.find_attachment_position()}">
@@ -60,14 +60,16 @@ class Joint(MuJoCoPart):
         """Creates the actuator XML for this joint"""
         child_actuators = "\n".join(
             filter(
-                lambda s: s != "",
-                [child.build_actuator() for child in self.children]
+                lambda s: s != "", [child.build_actuator() for child in self.children]
             )
         )
 
-        return f"""
+        return (
+            f"""
             <position ctrllimited="true" ctrlrange="{-self.range} {self.range}" joint="robot0:{self.name()}" kp="30000" name="robot0:{self.name()}" user="1"></position>
-        """ + child_actuators
+        """
+            + child_actuators
+        )
 
     def __str__(self):
         return f"Joint<name: {self.name()}, children: {len(self.children)}>"

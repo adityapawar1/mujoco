@@ -26,7 +26,7 @@ class FetchEnv(robot_env.RobotEnv):
         distance_threshold,
         initial_qpos,
         reward_type,
-        gripper_joints
+        gripper_joints,
     ):
         """Initializes a new Fetch environment.
         Args:
@@ -84,7 +84,9 @@ class FetchEnv(robot_env.RobotEnv):
             self.sim.forward()
 
     def _set_action(self, action):
-        assert action.shape == (1+self.gripper_joint_count,)  # z_ctrl(1), gripper_ctrl(n-1)
+        assert action.shape == (
+            1 + self.gripper_joint_count,
+        )  # z_ctrl(1), gripper_ctrl(n-1)
         action = (
             action.copy()
         )  # ensure that we don't change the action outside of this scope
@@ -111,17 +113,7 @@ class FetchEnv(robot_env.RobotEnv):
         # position * dt = velocity
         vel = delta_pos * self.sim.nsubsteps * self.sim.model.opt.timestep
 
-        action = np.concatenate(
-            [
-                [
-                    vel[0],
-                    vel[1],
-                    z_ctrl
-                ],
-                rot_ctrl,
-                gripper_ctrl
-            ]
-        )
+        action = np.concatenate([[vel[0], vel[1], z_ctrl], rot_ctrl, gripper_ctrl])
 
         # Apply action to simulation.
         self.set_gripper(gripper_ctrl)
@@ -129,11 +121,11 @@ class FetchEnv(robot_env.RobotEnv):
         utils.mocap_set_action(self.sim, action)
 
     def set_gripper(self, gripper_ctrl):
-        assert(self.gripper_joint_count == len(gripper_ctrl))
+        assert self.gripper_joint_count == len(gripper_ctrl)
 
         for action, joint in zip(gripper_ctrl, self.gripper_joints):
             # set action in simulation
-            self.sim.data.set_joint_qvel(f"robot0:{joint}", action * .5)
+            self.sim.data.set_joint_qvel(f"robot0:{joint}", action * 0.5)
 
     def _get_obs(self):
         # positions

@@ -62,6 +62,11 @@ class MuJoCoPart:
 
     def tree_representation(self, depth=0):
         tab_depth = r"   " * depth
-        children_tree = "".join([f"{tab_depth}├─ {child.tree_representation(depth=depth+1)}" for child in self.children])
+        children_tree = "".join(
+            [
+                f"{tab_depth}├─ {child.tree_representation(depth=depth+1)}"
+                for child in self.children
+            ]
+        )
         tree = f"{self.name()}: Size={self.size}, Pos={self.position}\n{children_tree}"
         return tree

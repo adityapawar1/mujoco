@@ -26,8 +26,7 @@ class RobotEnv(gym.GoalEnv):
         if model_path.startswith("/"):
             fullpath = model_path
         else:
-            fullpath = os.path.join(os.path.dirname(__file__),
-                                    "../assets", model_path)
+            fullpath = os.path.join(os.path.dirname(__file__), "../assets", model_path)
         if not os.path.exists(fullpath):
             raise IOError("File {} does not exist".format(fullpath))
 
@@ -35,7 +34,6 @@ class RobotEnv(gym.GoalEnv):
         self.sim = mujoco_py.MjSim(model, nsubsteps=n_substeps)
         self.viewer = None
         self._viewers = {}
-
 
         self.metadata = {
             "render.modes": ["human", "rgb_array"],
@@ -52,13 +50,21 @@ class RobotEnv(gym.GoalEnv):
         self.observation_space = spaces.Dict(
             dict(
                 desired_goal=spaces.Box(
-                    -np.inf, np.inf, shape=obs["achieved_goal"].shape, dtype="float32"
+                    # TODO: FIXME
+                    -100,
+                    100,
+                    shape=obs["achieved_goal"].shape,
+                    dtype="float64",
                 ),
                 achieved_goal=spaces.Box(
-                    -np.inf, np.inf, shape=obs["achieved_goal"].shape, dtype="float32"
+                    # TODO: FIXME
+                    -100,
+                    100,
+                    shape=obs["achieved_goal"].shape,
+                    dtype="float64",
                 ),
                 observation=spaces.Box(
-                    -np.inf, np.inf, shape=obs["observation"].shape, dtype="float32"
+                    -np.inf, np.inf, shape=obs["observation"].shape, dtype="float64"
                 ),
             )
         )
@@ -76,7 +82,7 @@ class RobotEnv(gym.GoalEnv):
 
     def step(self, action):
         action = np.clip(action, self.action_space.low, self.action_space.high)
-        self.action = action # action log 찍기 위해서
+        self.action = action  # action log 찍기 위해서
         self._set_action(action)
         self.sim.step()
         self._step_callback()
@@ -119,7 +125,7 @@ class RobotEnv(gym.GoalEnv):
             return data[::-1, :, :]
         elif mode == "human":
             self._get_viewer(mode).render()
-    
+
     def robot_get_obs(self):
         """Returns all joint positions and velocities associated with
         a robot.
