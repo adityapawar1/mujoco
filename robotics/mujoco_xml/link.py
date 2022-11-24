@@ -7,7 +7,7 @@ from mujoco_xml.part import MuJoCoPart, Attachment
 class Link(MuJoCoPart):
     """Defines a MuJoCo link"""
 
-    parent: MuJoCoPart | None = None
+    parent: MuJoCoPart = None
     idx: int = 0
 
     def name(self):

@@ -1,3 +1,3 @@
-from robotics.envs.train_env import TrainEnv
-from robotics.envs import rotations
-from robotics.envs import utils
+from envs.train_env import TrainEnv
+from envs import rotations
+from envs import utils

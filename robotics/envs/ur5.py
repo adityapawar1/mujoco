@@ -1,8 +1,6 @@
-import numpy as np
 import os
-from gym import utils, error, spaces
+from gym import utils
 from gym.envs.mujoco import mujoco_env
-from mujoco_py import MjViewer, functions
 
 
 class UR5Env(mujoco_env.MujocoEnv, utils.EzPickle):
@@ -18,8 +16,9 @@ class UR5Env(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         utils.EzPickle.__init__(self)
 
-        FILE_PATH = os.path.join(os.path.dirname(__file__),
-                                 "./../assets/mujoco-ur5-model/example.xml")
+        FILE_PATH = os.path.join(
+            os.path.dirname(__file__), "./../assets/mujoco-ur5-model/example.xml"
+        )
         frame_skip = 5
         mujoco_env.MujocoEnv.__init__(self, FILE_PATH, frame_skip)
 
