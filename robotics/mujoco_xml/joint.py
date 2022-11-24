@@ -17,7 +17,7 @@ class Joint(MuJoCoPart):
 
     range: float
     joint_type: JointType
-    parent: MuJoCoPart | None = None
+    parent: MuJoCoPart = None
     idx: int = 0
 
     def name(self):

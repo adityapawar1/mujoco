@@ -27,7 +27,7 @@ class EndEffector:
         children=[],
     )
 
-    def __init__(self, parts: list[MuJoCoPart]) -> None:
+    def __init__(self, parts) -> None:
         [self.base_link.add_child(part) for part in parts]
 
     def add_to_base(self, part: MuJoCoPart):
