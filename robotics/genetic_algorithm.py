@@ -101,9 +101,11 @@ class EndEffectorGA(pygad.GA):
         return total_reward
 
     @staticmethod
-    def on_mutation(chromosome, ga):
-        random_gene_index = np.random.choice(range(len(ga.SINGLE_JOINT_SPACE)))
-        random_gene_space = ga.SINGLE_JOINT_SPACE[random_gene_index]
+    def on_mutation(chromosome, _):
+        random_gene_index = np.random.choice(
+            range(len(EndEffectorGA.SINGLE_JOINT_SPACE))
+        )
+        random_gene_space = EndEffectorGA.SINGLE_JOINT_SPACE[random_gene_index]
 
         new_gene_value = None
         if isinstance(random_gene_space, list):
