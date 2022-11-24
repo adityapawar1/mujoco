@@ -1,3 +1,4 @@
+from time import time
 from gym.core import gym
 import numpy as np
 import pygad
@@ -72,6 +73,7 @@ class EndEffectorGA(pygad.GA):
     def fitness_func(chromosome, idx):
         # TODO: FIXME
         # TODO: Better logging
+        start_time = time()
         end_effector = utils.chromosome_to_end_effector(chromosome, NUM_JOINTS)
         # print(f"Chromosome: {chromosome}, Shape: {chromosome.shape}")
         end_effector.build()
@@ -99,6 +101,7 @@ class EndEffectorGA(pygad.GA):
         env.close()
 
         print(f"Fitness for {idx}: {total_reward}")
+        print(f"Total training time {(time() - start_time)/60}min")
         return total_reward
 
     @staticmethod
