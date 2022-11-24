@@ -65,9 +65,13 @@ class EndEffectorGA(pygad.GA):
 
     @staticmethod
     def callback_gen(ga: pygad.GA):
-        print("============= GENERATION FINISHED =============")
-        print("Generation: ", ga.generations_completed)
+        print(
+            f"============= GENERATION {ga.generations_completed} FINISHED ============="
+        )
         print("Attributes of the best solution :", ga.best_solution())
+        print(
+            f"============= STARTING GENERATION {ga.generations_completed} ============="
+        )
 
     @staticmethod
     def fitness_func(chromosome, idx):
