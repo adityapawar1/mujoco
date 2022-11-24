@@ -17,17 +17,17 @@ FOOTER = """
 class EndEffector:
     """A class to store the tree of MuJoCo parts making up an entire end effector"""
 
-    base_link: MuJoCoPart = Link(
-        parent=None,
-        position=Position.zero(),
-        idx=0,
-        size=Size.zero(),
-        attachment=Attachment.X,
-        friction=1,
-        children=[],
-    )
-
     def __init__(self, parts) -> None:
+        self.base_link: MuJoCoPart = Link(
+            parent=None,
+            position=Position.zero(),
+            idx=0,
+            size=Size.zero(),
+            attachment=Attachment.X,
+            friction=1,
+            children=[],
+        )
+
         [self.base_link.add_child(part) for part in parts]
 
     def add_to_base(self, part: MuJoCoPart):

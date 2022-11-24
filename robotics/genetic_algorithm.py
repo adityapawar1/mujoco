@@ -7,8 +7,8 @@ from stable_baselines3.ppo.ppo import PPO
 from envs.train_env import TrainEnv
 
 NUM_JOINTS = 6
-TRAIN_TIMESTEPS = 100_000
-TEST_TIMESTEPS = 5_000
+TRAIN_TIMESTEPS = 10_000
+TEST_TIMESTEPS = 1_000
 
 
 class EndEffectorGA(pygad.GA):
@@ -45,6 +45,8 @@ class EndEffectorGA(pygad.GA):
         print(
             f"Creating genetic algorithm: Number of joints: {NUM_JOINTS}, Number of generations: {num_generations}, Parents mating: {num_parents_mating}, Population count: {population_count}"
         )
+        print(f"Single joint space shape: {np.array(self.SINGLE_JOINT_SPACE)}")
+
         gene_type = np.tile(self.SINGLE_JOINT_VARIABLES, NUM_JOINTS).tolist()
         gene_space = np.tile(self.SINGLE_JOINT_SPACE, NUM_JOINTS).tolist()
 
@@ -61,7 +63,7 @@ class EndEffectorGA(pygad.GA):
         )
 
     @staticmethod
-    def callback_gen(ga):
+    def callback_gen(ga: pygad.GA):
         print("Generation : ", ga.generations_completed)
         print("Fitness of the best solution :", ga.best_solution()[1])
 
@@ -69,6 +71,7 @@ class EndEffectorGA(pygad.GA):
     def fitness_func(chromosome, idx):
         # TODO: FIXME
         # TODO: Better logging
+        print(f"Chromosome: {chromosome}, Shape: {chromosome.shape}")
         end_effector = utils.chromosome_to_end_effector(chromosome, NUM_JOINTS)
         end_effector.build()
         print(f"Building end effector {idx}:")
@@ -127,6 +130,7 @@ if __name__ == "__main__":
 
     try:
         ga = pygad.load("mujoco_ga_instance")
+        print("Loaded GA instance")
     except Exception as e:
         print("Error while loading previous GA instace, creating a new one")
         print(e)
