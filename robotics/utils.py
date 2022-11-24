@@ -1,8 +1,8 @@
 import numpy as np
 
-from robotics.end_effector import EndEffector
-from robotics.mujoco_xml.joint import Joint, JointType
-from robotics.mujoco_xml.part import Attachment, Position, Size
+from end_effector import EndEffector
+from mujoco_xml.joint import Joint, JointType
+from mujoco_xml.part import Attachment, Position, Size
 
 
 def chromosome_to_end_effector(chromosome, num_joints):

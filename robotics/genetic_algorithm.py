@@ -4,7 +4,7 @@ import pygad
 import utils
 from stable_baselines3.ppo.ppo import PPO
 
-from robotics.envs.train_env import TrainEnv
+from envs.train_env import TrainEnv
 
 NUM_JOINTS = 6
 TRAIN_TIMESTEPS = 100_000

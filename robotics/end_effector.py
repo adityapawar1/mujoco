@@ -1,8 +1,8 @@
 import os
 
-from robotics.mujoco_xml.joint import Joint, JointType
-from robotics.mujoco_xml.link import Link
-from robotics.mujoco_xml.part import Attachment, MuJoCoPart, Position, Size
+from mujoco_xml.joint import Joint, JointType
+from mujoco_xml.link import Link
+from mujoco_xml.part import Attachment, MuJoCoPart, Position, Size
 
 HEADER = """
     <?xml version="1.0" encoding="utf-8"?>
