@@ -36,13 +36,13 @@ class Position(Vector3):
         return Position(0, 0, 0)
 
 
-@dataclass(kw_only=True)
+@dataclass()
 class MuJoCoPart:
     size: Size
     attachment: Attachment
     friction: float
     position: Position
-    children: list = field(default_factory=list)
+    children: list
 
     def add_child(self, child):
         child.set_parent(self, len(self.children))

@@ -1,12 +1,14 @@
 from gym.core import gym
 import numpy as np
 import pygad
-from robotics import utils
-from stable_baselines3 import PPO
+import utils
+from stable_baselines3.ppo.ppo import PPO
 
 from robotics.envs.train_env import TrainEnv
 
-TRAIN_TIMESTEPS = 10_000
+NUM_JOINTS = 6
+TRAIN_TIMESTEPS = 100_000
+TEST_TIMESTEPS = 5_000
 
 
 class EndEffectorGA(pygad.GA):
@@ -35,18 +37,16 @@ class EndEffectorGA(pygad.GA):
 
     def __init__(
         self,
-        num_joints: int,
         num_generations: int,
         num_parents_mating: int,
         population_count: int,
     ) -> None:
 
         print(
-            f"Creating genetic algorithm: Number of joints: {num_joints}, Number of generations: {num_generations}, Parents mating: {num_parents_mating}, Population count: {population_count}"
+            f"Creating genetic algorithm: Number of joints: {NUM_JOINTS}, Number of generations: {num_generations}, Parents mating: {num_parents_mating}, Population count: {population_count}"
         )
-        self.num_joints = num_joints
-        gene_type = np.tile(self.SINGLE_JOINT_VARIABLES, num_joints).tolist()
-        gene_space = np.tile(self.SINGLE_JOINT_SPACE, num_joints).tolist()
+        gene_type = np.tile(self.SINGLE_JOINT_VARIABLES, NUM_JOINTS).tolist()
+        gene_space = np.tile(self.SINGLE_JOINT_SPACE, NUM_JOINTS).tolist()
 
         super().__init__(
             num_generations=num_generations,
@@ -57,24 +57,31 @@ class EndEffectorGA(pygad.GA):
             gene_space=gene_space,
             fitness_func=self.fitness_func,
             on_mutation=self.on_mutation,
+            on_generation=self.callback_gen,
         )
+
+    @staticmethod
+    def callback_gen(ga):
+        print("Generation : ", ga.generations_completed)
+        print("Fitness of the best solution :", ga.best_solution()[1])
 
     @staticmethod
     def fitness_func(chromosome, idx):
         # TODO: FIXME
-        end_effector = utils.chromosome_to_end_effector(chromosome, 6)
+        end_effector = utils.chromosome_to_end_effector(chromosome, NUM_JOINTS)
         end_effector.build()
-        env = TrainEnv()
 
+        env = TrainEnv()
         model = PPO("MultiInputPolicy", env, verbose=1)
+        print(f"Starting training for idx: {idx}")
         model.learn(total_timesteps=TRAIN_TIMESTEPS)
+        print(f"Finished training for idx: {idx}")
 
         obs = env.reset()
         done = False
-        test_steps = 10_000
 
         total_reward = 0
-        for _ in range(test_steps):
+        for _ in range(TEST_TIMESTEPS):
             obs, reward, done, _ = env.step(model.predict(obs)[0])
             total_reward += reward
             if done:
@@ -82,7 +89,7 @@ class EndEffectorGA(pygad.GA):
                 obs = env.reset()
 
         print(end_effector.ga_string())
-        print("Episode Reward: " + str(total_reward))
+        print(f"Fitness for {idx}: {total_reward}")
         return total_reward
 
     @staticmethod
@@ -109,13 +116,14 @@ class EndEffectorGA(pygad.GA):
 
 
 if __name__ == "__main__":
-    num_joints = 6
-    num_generations = 1
-    num_parents_mating = 1
-    population_count = 2
+    num_generations = 10
+    num_parents_mating = 2
+    population_count = 5
 
     ga = EndEffectorGA(
-        num_joints, num_generations, num_parents_mating, population_count
+        num_generations,
+        num_parents_mating,
+        population_count,
     )
 
     ga.run()

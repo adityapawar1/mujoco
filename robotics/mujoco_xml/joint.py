@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 
-from robotics.mujoco_xml.part import MuJoCoPart, Attachment
+from mujoco_xml.part import MuJoCoPart, Attachment
 
 
 class JointType(Enum):

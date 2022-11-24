@@ -24,6 +24,7 @@ class EndEffector:
         size=Size.zero(),
         attachment=Attachment.X,
         friction=1,
+        children=[],
     )
 
     def __init__(self, parts: list[MuJoCoPart]) -> None:
@@ -63,6 +64,7 @@ if __name__ == "__main__":
         size=Size(0.05, 0.015, 0.05),
         attachment=Attachment.Z,
         friction=1.0,
+        children=[],
     )
     joint2 = Joint(
         range=0.15,
@@ -71,6 +73,7 @@ if __name__ == "__main__":
         size=Size(0.05, 0.015, 0.05),
         attachment=Attachment.Z,
         friction=1.0,
+        children=[],
     )
     joint3 = Joint(
         range=0.15,
@@ -79,6 +82,7 @@ if __name__ == "__main__":
         size=Size(0.05, 0.015, 0.05),
         attachment=Attachment.Z,
         friction=1.0,
+        children=[],
     )
 
     joint1.add_child(joint3)

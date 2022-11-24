@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from robotics.mujoco_xml.part import MuJoCoPart, Attachment
+from mujoco_xml.part import MuJoCoPart, Attachment
 
 
 @dataclass()

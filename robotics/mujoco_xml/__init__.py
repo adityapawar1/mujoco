@@ -1,3 +1,3 @@
-from robotics.mujoco_xml.part import MuJoCoPart
-from robotics.mujoco_xml.joint import Joint
-from robotics.mujoco_xml.link import Link
+from mujoco_xml.part import MuJoCoPart
+from mujoco_xml.joint import Joint
+from mujoco_xml.link import Link
