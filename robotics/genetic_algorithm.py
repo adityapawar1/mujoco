@@ -7,8 +7,8 @@ from stable_baselines3.ppo.ppo import PPO
 from envs.train_env import TrainEnv
 
 NUM_JOINTS = 6
-TRAIN_TIMESTEPS = 10_000
-TEST_TIMESTEPS = 1_000
+TRAIN_TIMESTEPS = 30_000
+TEST_TIMESTEPS = 2_000
 
 
 class EndEffectorGA(pygad.GA):
@@ -58,21 +58,22 @@ class EndEffectorGA(pygad.GA):
             gene_type=gene_type,
             gene_space=gene_space,
             fitness_func=self.fitness_func,
-            on_mutation=self.on_mutation,
             on_generation=self.callback_gen,
+            parallel_processing=["thread", 2],
         )
 
     @staticmethod
     def callback_gen(ga: pygad.GA):
-        print("Generation : ", ga.generations_completed)
-        print("Fitness of the best solution :", ga.best_solution()[1])
+        print("============= GENERATION FINISHED =============")
+        print("Generation: ", ga.generations_completed)
+        print("Attributes of the best solution :", ga.best_solution())
 
     @staticmethod
     def fitness_func(chromosome, idx):
         # TODO: FIXME
         # TODO: Better logging
-        print(f"Chromosome: {chromosome}, Shape: {chromosome.shape}")
         end_effector = utils.chromosome_to_end_effector(chromosome, NUM_JOINTS)
+        # print(f"Chromosome: {chromosome}, Shape: {chromosome.shape}")
         end_effector.build()
         print(f"Building end effector {idx}:")
         print(end_effector)
@@ -101,7 +102,7 @@ class EndEffectorGA(pygad.GA):
         return total_reward
 
     @staticmethod
-    def on_mutation(chromosome, _):
+    def on_mutation(ga, chromosome):
         random_gene_index = np.random.choice(
             range(len(EndEffectorGA.SINGLE_JOINT_SPACE))
         )
@@ -127,8 +128,8 @@ class EndEffectorGA(pygad.GA):
 
 if __name__ == "__main__":
     num_generations = 10
-    num_parents_mating = 2
-    population_count = 5
+    num_parents_mating = 4
+    population_count = 8
 
     try:
         ga = pygad.load("mujoco_ga_instance")
@@ -148,8 +149,9 @@ if __name__ == "__main__":
     except Exception as e:
         print("Error while running genetic algorithm, saving ga instance")
         print(e)
-        ga.save("mujoco_ga_instance")
-        ga.plot_fitness()
+
+    ga.save("mujoco_ga_instance")
+    ga.plot_fitness()
 
     solution, solution_fitness, solution_idx = ga.best_solution()
     print(f"Parameters of the best solution : {solution}")
