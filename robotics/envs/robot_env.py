@@ -114,6 +114,7 @@ class RobotEnv(gym.GoalEnv):
             # self.viewer.finish()
             self.viewer = None
             self._viewers = {}
+        self.sim.reset()
 
     def render(self, mode="human", width=DEFAULT_SIZE, height=DEFAULT_SIZE):
         self._render_callback()

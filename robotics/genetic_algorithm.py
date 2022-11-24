@@ -91,7 +91,9 @@ class EndEffectorGA(pygad.GA):
                 print("Resetting env")
                 obs = env.reset()
 
+        model.save(f"models/end_effector{idx}")
         env.close()
+
         print(f"Fitness for {idx}: {total_reward}")
         return total_reward
 
@@ -123,15 +125,25 @@ if __name__ == "__main__":
     num_parents_mating = 2
     population_count = 5
 
-    ga = EndEffectorGA(
-        num_generations,
-        num_parents_mating,
-        population_count,
-    )
+    try:
+        ga = pygad.load("mujoco_ga_instance")
+    except Exception as e:
+        print("Error while loading previous GA instace, creating a new one")
+        print(e)
 
-    ga.run()
-    ga.plot_fitness()
-    ga.save("mujoco_ga_instance")
+        ga = EndEffectorGA(
+            num_generations,
+            num_parents_mating,
+            population_count,
+        )
+
+    try:
+        ga.run()
+    except Exception as e:
+        print("Error while running genetic algorithm, saving ga instance")
+        print(e)
+        ga.save("mujoco_ga_instance")
+        ga.plot_fitness()
 
     solution, solution_fitness, solution_idx = ga.best_solution()
     print(f"Parameters of the best solution : {solution}")
