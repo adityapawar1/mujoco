@@ -68,8 +68,11 @@ class EndEffectorGA(pygad.GA):
     @staticmethod
     def fitness_func(chromosome, idx):
         # TODO: FIXME
+        # TODO: Better logging
         end_effector = utils.chromosome_to_end_effector(chromosome, NUM_JOINTS)
         end_effector.build()
+        print(f"Building end effector {idx}:")
+        print(end_effector)
 
         env = TrainEnv()
         model = PPO("MultiInputPolicy", env, verbose=1)
@@ -88,7 +91,7 @@ class EndEffectorGA(pygad.GA):
                 print("Resetting env")
                 obs = env.reset()
 
-        print(end_effector.ga_string())
+        env.close()
         print(f"Fitness for {idx}: {total_reward}")
         return total_reward
 
