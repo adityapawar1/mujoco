@@ -75,7 +75,7 @@ class EndEffectorGA(pygad.GA):
         print(end_effector)
 
         env = TrainEnv()
-        model = PPO("MultiInputPolicy", env, verbose=1)
+        model = PPO("MultiInputPolicy", env, verbose=0)
         print(f"Starting training for idx: {idx}")
         model.learn(total_timesteps=TRAIN_TIMESTEPS)
         print(f"Finished training for idx: {idx}")
@@ -131,6 +131,7 @@ if __name__ == "__main__":
 
     ga.run()
     ga.plot_fitness()
+    ga.save("mujoco_ga_instance")
 
     solution, solution_fitness, solution_idx = ga.best_solution()
     print(f"Parameters of the best solution : {solution}")
