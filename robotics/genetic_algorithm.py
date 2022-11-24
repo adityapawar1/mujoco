@@ -4,6 +4,10 @@ import pygad
 from robotics import utils
 from stable_baselines3 import PPO
 
+from robotics.envs.train_env import TrainEnv
+
+TRAIN_TIMESTEPS = 10_000
+
 
 class EndEffectorGA(pygad.GA):
     """
@@ -60,23 +64,26 @@ class EndEffectorGA(pygad.GA):
         # TODO: FIXME
         end_effector = utils.chromosome_to_end_effector(chromosome, 6)
         end_effector.build()
-        env = gym.make("EndEffectorEnv-v0")
+        env = TrainEnv()
 
         model = PPO("MultiInputPolicy", env, verbose=1)
-        model.learn(total_timesteps=10_000)
+        model.learn(total_timesteps=TRAIN_TIMESTEPS)
 
-        env = gym.make("EndEffectorEnv-v0")
         obs = env.reset()
         done = False
-        episode_reward = 0
-        while not done:
-            obs, reward, done, _info = env.step(model.predict(obs)[0])
-            episode_reward += reward
-        env.close()
+        test_steps = 10_000
+
+        total_reward = 0
+        for _ in range(test_steps):
+            obs, reward, done, _ = env.step(model.predict(obs)[0])
+            total_reward += reward
+            if done:
+                print("Resetting env")
+                obs = env.reset()
 
         print(end_effector.ga_string())
-        print("Episode Reward: " + str(episode_reward))
-        print()
+        print("Episode Reward: " + str(total_reward))
+        return total_reward
 
     @staticmethod
     def on_mutation(chromosome, ga):

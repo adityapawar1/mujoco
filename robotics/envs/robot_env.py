@@ -51,15 +51,15 @@ class RobotEnv(gym.GoalEnv):
             dict(
                 desired_goal=spaces.Box(
                     # TODO: FIXME
-                    -100,
-                    100,
+                    -np.inf,
+                    np.inf,
                     shape=obs["achieved_goal"].shape,
                     dtype="float64",
                 ),
                 achieved_goal=spaces.Box(
                     # TODO: FIXME
-                    -100,
-                    100,
+                    -np.inf,
+                    np.inf,
                     shape=obs["achieved_goal"].shape,
                     dtype="float64",
                 ),
