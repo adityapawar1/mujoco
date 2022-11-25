@@ -60,7 +60,8 @@ class EndEffectorGA(pygad.GA):
             gene_space=gene_space,
             fitness_func=self.fitness_func,
             on_generation=self.callback_gen,
-            parallel_processing=["thread", 2],
+            # TODO: Add multithreading
+            # parallel_processing=["thread", 2],
         )
 
     @staticmethod
@@ -72,10 +73,12 @@ class EndEffectorGA(pygad.GA):
         print(
             f"============= STARTING GENERATION {ga.generations_completed} ============="
         )
+        ga.save(f"mujoco_ga_instance_gen_{ga.generations_completed}")
 
     @staticmethod
     def fitness_func(chromosome, idx):
         # TODO: FIXME
+        # TODO: Better logging
         # TODO: Better logging
         start_time = time()
         end_effector = utils.chromosome_to_end_effector(chromosome, NUM_JOINTS)
