@@ -71,6 +71,8 @@ class EndEffectorGA(pygad.GA):
         print(
             f"============= STARTING GENERATION {ga.generations_completed} ============="
         )
+        ga.save(f"mujoco_ga_instance_gen_{ga.generations_completed}")
+        print("Saved GA instance checkpoint")
 
     @staticmethod
     def fitness_func(chromosome, idx):
