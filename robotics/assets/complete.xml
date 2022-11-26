@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mujoco>
-	<compiler angle="radian" coordinate="local" meshdir="../stls/fetch" texturedir="../textures"></compiler>
+  <compiler angle="radian" coordinate="local" meshdir="../../stls/fetch" texturedir="../../textures"></compiler>
 	<option timestep="0.002">
 		<flag warmstart="enable"></flag>
 	</option>
   <size njmax="6000" nconmax="500" />
 
-	<include file="shared.xml"></include>
+  <include file="../shared.xml"></include>
 	
 	<worldbody>
 	<!-- material=floor_mat 는 shared.xml에 정의 -->
@@ -15,9 +15,9 @@
 			<site name="target0" pos="0 0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere"></site>
 		</body>
 
-		<include file="robot.xml"></include>
+    <include file="../robot.xml"></include>
 		
-		<body pos="1.3 0.75 0.2" name="table0">
+		<body pos="1.1 0.50 0.2" name="table0">
 			<geom size="0.5 0.45 0.2" type="box" mass="2000" material="table_mat"></geom>
 		</body>
 		

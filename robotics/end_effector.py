@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from mujoco_xml.joint import Joint, JointType
 from mujoco_xml.link import Link
@@ -33,24 +34,28 @@ class EndEffector:
     def add_to_base(self, part: MuJoCoPart):
         self.base_link.add_child(part)
 
-    def build(self):
+    def build(self, path: str):
         geometry = self.base_link.build_geometry()
         actuator = self.base_link.build_actuator()
 
+        path = os.path.join("robotics", "assets", path)
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+            template_xml_path = os.path.join("robotics", "assets", "complete.xml")
+            shutil.copy(template_xml_path, os.path.join(path, "complete.xml"))
+
         with open(
-            os.path.join("robotics", "assets", "fetch", "end_effector_geometry.xml"),
+            os.path.join(path, "end_effector_geometry.xml"),
             "w",
         ) as file:
             file.write(f"{HEADER} \n {geometry} \n {FOOTER}")
 
         with open(
-            os.path.join("robotics", "assets", "fetch", "end_effector_actuator.xml"),
+            os.path.join(path, "end_effector_actuator.xml"),
             "w",
         ) as file:
             file.write(f"{HEADER} \n {actuator} \n {FOOTER}")
-
-    def ga_string(self) -> str:
-        return ""
 
     def __str__(self) -> str:
         return f"""End effector:\n{self.base_link.tree_representation()}"""

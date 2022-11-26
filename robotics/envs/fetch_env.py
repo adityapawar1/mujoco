@@ -66,9 +66,13 @@ class FetchEnv(robot_env.RobotEnv):
     # GoalEnv methods
     # ----------------------------
 
-    def compute_reward(self, achieved_goal, goal, info):
+    def compute_reward(self, achieved_goal, gripper, info):
         # Compute distance between goal and the achieved goal.
-        d = goal_distance(achieved_goal, goal)
+        d = goal_distance(achieved_goal, gripper)
+        if d < self.distance_threshold:
+            # The higher, the better
+            # We want it to pick up the object
+            d += gripper[2]
         if self.reward_type == "sparse":
             return -(d > self.distance_threshold).astype(np.float32)
         else:
@@ -170,11 +174,19 @@ class FetchEnv(robot_env.RobotEnv):
             ]
         )
 
+        desired_goal = [grip_pos[0], grip_pos[1], self.goal.copy()[2]]
+
         return {
             "observation": obs.copy(),
             "achieved_goal": achieved_goal.copy(),
-            "desired_goal": self.goal.copy(),
+            "desired_goal": desired_goal,
         }
+
+    # def _is_done(self, obs):
+    #     object_pos = self.sim.data.get_site_xpos("object0")
+    #     print(obs)
+    #     print(object_pos)
+    #     return False
 
     def _viewer_setup(self):
         body_id = self.sim.model.body_name2id("robot0:gripper_link")
@@ -189,7 +201,10 @@ class FetchEnv(robot_env.RobotEnv):
         # Visualize target.
         sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()
         site_id = self.sim.model.site_name2id("target0")
-        self.sim.model.site_pos[site_id] = self.goal - sites_offset[0]
+
+        grip_pos = self.sim.data.get_site_xpos("robot0:grip")
+        desired_goal = [grip_pos[0], grip_pos[1], self.goal.copy()[2]]
+        self.sim.model.site_pos[site_id] = desired_goal - sites_offset[0]
         self.sim.forward()
 
     def _reset_sim(self):
@@ -217,8 +232,8 @@ class FetchEnv(robot_env.RobotEnv):
             )
             goal += self.target_offset
             goal[2] = self.height_offset
-            if self.target_in_the_air and self.np_random.uniform() < 0.5:
-                goal[2] += self.np_random.uniform(0, 0.45)
+            if self.target_in_the_air:
+                goal[2] += self.np_random.uniform(0.15, 0.45)
         else:
             goal = self.initial_gripper_xpos[:3] + self.np_random.uniform(
                 -self.target_range, self.target_range, size=3

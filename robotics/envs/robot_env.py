@@ -92,7 +92,8 @@ class RobotEnv(gym.GoalEnv):
         info = {
             "is_success": self._is_success(obs["achieved_goal"], self.goal),
         }
-        reward = self.compute_reward(obs["achieved_goal"], self.goal, info)
+        gripper_pos = obs["observation"][:3]
+        reward = self.compute_reward(obs["achieved_goal"], gripper_pos, info)
         return obs, reward, done, info
 
     def reset(self):
@@ -166,6 +167,10 @@ class RobotEnv(gym.GoalEnv):
     def _get_obs(self):
         """Returns the observation."""
         raise NotImplementedError()
+
+    # def _is_done(self, obs):
+    #     """Return whether the env should reset"""
+    #     raise NotImplementedError()
 
     def _set_action(self, action):
         """Applies the given action to the simulation."""
