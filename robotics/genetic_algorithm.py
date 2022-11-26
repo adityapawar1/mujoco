@@ -12,8 +12,10 @@ from stable_baselines3.ppo.ppo import PPO
 from envs.train_env import TrainEnv
 
 NUM_JOINTS = 6
-TRAIN_TIMESTEPS = 30_000
+TRAIN_TIMESTEPS = 40_000
 TEST_TIMESTEPS = 2_000
+BATCH_SIZE = 10_000
+THREADS = 3
 
 
 class EndEffectorGA(pygad.GA):
@@ -65,7 +67,7 @@ class EndEffectorGA(pygad.GA):
             gene_space=gene_space,
             fitness_func=self.fitness_func,
             on_generation=self.callback_gen,
-            parallel_processing=["thread", 4],
+            parallel_processing=["thread", THREADS],
         )
 
     @staticmethod
@@ -90,6 +92,8 @@ class EndEffectorGA(pygad.GA):
         # TODO: Better logging
         start_time = time()
         robot_asset_path = f"robot_{idx}"
+        tb_logdir = os.path.join("logs", datetime.now().strftime("%Y%m%d-%H%M%S"))
+        print(tb_logdir)
 
         end_effector = utils.chromosome_to_end_effector(chromosome, NUM_JOINTS)
         end_effector.build(robot_asset_path)
@@ -98,17 +102,29 @@ class EndEffectorGA(pygad.GA):
         print(end_effector)
 
         env = TrainEnv(robot_asset_path)
-        model = PPO("MultiInputPolicy", env, verbose=0)
         print(f"Starting training for idx: {idx}")
 
         try:
-            model.load(f"models/end_effector{idx}")
+            model = PPO.load(
+                f"models/end_effector{idx}", env, verbose=0, tensorboard_log=tb_logdir
+            )
             print(f"Loaded {idx} model")
         except Exception as e:
-            print(f"Could not load {idx} model")
+            model = PPO(
+                "MultiInputPolicy",
+                env,
+                verbose=1,
+                tensorboard_log=tb_logdir,
+                batch_size=BATCH_SIZE,
+            )
+            print(f"Could not load {idx} model, creating new model")
             print(e)
 
-        model.learn(total_timesteps=TRAIN_TIMESTEPS)
+        model.learn(
+            total_timesteps=TRAIN_TIMESTEPS,
+            tb_log_name=robot_asset_path,
+            reset_num_timesteps=False,
+        )
         print(f"Finished training for idx: {idx}")
 
         obs = env.reset()
@@ -129,7 +145,8 @@ class EndEffectorGA(pygad.GA):
         EndEffectorGA.current_gen_fitness[idx] = fitness
         print(f"Fitness for {idx}: {fitness}")
         print(f"Total training time {(time() - start_time)/60}min")
-        backup_data()
+        if idx % 4 == 0:
+            backup_data()
         return fitness
 
 
