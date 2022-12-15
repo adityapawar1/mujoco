@@ -38,3 +38,5 @@ tutorial/*.html
 # PyCharm project files
 .idea
 vizdoom.ini
+
+**/assets/robot_*
