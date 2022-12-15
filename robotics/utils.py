@@ -14,7 +14,7 @@ def chromosome_to_end_effector(chromosome, num_joints):
         position = Position(joint_genes[0], joint_genes[1], joint_genes[2])
         joint_type = JointType.SLIDE if joint_genes[3] == 1 else JointType.HINGE
         size = Size(joint_genes[4], joint_genes[5], joint_genes[6])
-        attachment = [Attachment.X, Attachment.Y, Attachment.Z][joint_genes[7]]
+        attachment = [Attachment.X, Attachment.Y, Attachment.Z][int(joint_genes[7])]
         joint_range = (
             0.15 if joint_type == JointType.SLIDE else 0.75
         )  # hinge needs more range

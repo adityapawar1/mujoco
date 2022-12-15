@@ -93,4 +93,4 @@ if __name__ == "__main__":
     joint1.add_child(joint3)
     end_effector = EndEffector([joint1, joint2])
     print(end_effector)
-    end_effector.build()
+    end_effector.build("dev")

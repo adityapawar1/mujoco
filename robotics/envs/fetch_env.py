@@ -68,15 +68,18 @@ class FetchEnv(robot_env.RobotEnv):
 
     def compute_reward(self, achieved_goal, gripper, info):
         # Compute distance between goal and the achieved goal.
-        d = goal_distance(achieved_goal, gripper)
+        d = gripper[2] - achieved_goal[2]
+
+        if self.reward_type == "sparse":
+            return -(d > self.distance_threshold).astype(np.float32)
+
         if d < self.distance_threshold:
             # The higher, the better
             # We want it to pick up the object
-            d += gripper[2]
-        if self.reward_type == "sparse":
-            return -(d > self.distance_threshold).astype(np.float32)
-        else:
-            return -d
+            # Subtracting adds when we negate it again
+            d -= gripper[2] * 0.3
+
+        return -d
 
     # RobotEnv methods
     # ----------------------------
@@ -115,7 +118,7 @@ class FetchEnv(robot_env.RobotEnv):
         delta_pos = object_pos - grip_pos
 
         # position * dt = velocity
-        vel = delta_pos * self.sim.nsubsteps * self.sim.model.opt.timestep
+        vel = delta_pos * self.dt
 
         action = np.concatenate([[vel[0], vel[1], z_ctrl], rot_ctrl, gripper_ctrl])
 

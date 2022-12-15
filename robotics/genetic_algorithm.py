@@ -1,4 +1,5 @@
 from time import time
+import logging
 from datetime import datetime
 
 import shutil
@@ -27,7 +28,7 @@ class EndEffectorGA(pygad.GA):
     - attachment location (x, y, z) (one of the 3)
     """
 
-    FLOAT_SPACE = {"low": 0.0001, "high": 0.050, "step": 0.0005}
+    FLOAT_SPACE = {"low": 0.0001, "high": 0.01, "step": 0.005}
     JOINT_TYPE_SPACE = [1, 2]
     ATTACHMENT_LOC_SPACE = [0, 1, 2]
     SINGLE_JOINT_VARIABLES = [float, float, float, int, float, float, float, int]
@@ -50,7 +51,7 @@ class EndEffectorGA(pygad.GA):
         population_count: int,
     ) -> None:
 
-        print(
+        logging.info(
             f"Creating genetic algorithm: Number of joints: {NUM_JOINTS}, Number of generations: {num_generations}, Parents mating: {num_parents_mating}, Population count: {population_count}"
         )
 
@@ -67,24 +68,20 @@ class EndEffectorGA(pygad.GA):
             gene_space=gene_space,
             fitness_func=self.fitness_func,
             on_generation=self.callback_gen,
+            save_solutions=True,
             parallel_processing=["thread", THREADS],
         )
 
     @staticmethod
     def callback_gen(ga):
-        print(
-            f"============= GENERATION {ga.generations_completed} FINISHED ============="
+        logging.info(f"Generation {ga.generations_completed} Finished")
+        logging.info(
+            f"Attributes of the best solution: {ga.best_solution(pop_fitness=ga.current_gen_fitness)}"
         )
-        print(
-            "Attributes of the best solution :",
-            ga.best_solution(pop_fitness=ga.current_gen_fitness),
-        )
-        print(
-            f"============= STARTING GENERATION {ga.generations_completed+1} ============="
-        )
+        logging.info(f"Generation {ga.generations_completed + 1} Starting")
         ga.save(f"mujoco_ga_instance_gen_{ga.generations_completed}")
         backup_data(ga=ga)
-        print("Saved and downloaded GA instance checkpoint")
+        logging.debug("Saved and downloaded GA instance checkpoint")
 
     @staticmethod
     def fitness_func(chromosome, idx):
@@ -93,22 +90,22 @@ class EndEffectorGA(pygad.GA):
         start_time = time()
         robot_asset_path = f"robot_{idx}"
         tb_logdir = os.path.join("logs", datetime.now().strftime("%Y%m%d-%H%M%S"))
-        print(tb_logdir)
+        logging.debug(f"Tensorboard logging at {tb_logdir}")
 
         end_effector = utils.chromosome_to_end_effector(chromosome, NUM_JOINTS)
         end_effector.build(robot_asset_path)
 
-        print(f"Building end effector {idx}:")
-        print(end_effector)
+        logging.debug(f"Building end effector {idx}:")
+        logging.debug(end_effector)
 
         env = TrainEnv(robot_asset_path)
-        print(f"Starting training for idx: {idx}")
+        logging.info(f"Starting training for idx: {idx}")
 
         try:
             model = PPO.load(
                 f"models/end_effector{idx}", env, verbose=0, tensorboard_log=tb_logdir
             )
-            print(f"Loaded {idx} model")
+            logging.debug(f"Loaded {idx} model")
         except Exception as e:
             model = PPO(
                 "MultiInputPolicy",
@@ -117,15 +114,15 @@ class EndEffectorGA(pygad.GA):
                 tensorboard_log=tb_logdir,
                 batch_size=BATCH_SIZE,
             )
-            print(f"Could not load {idx} model, creating new model")
-            print(e)
+            logging.info(f"Could not load {idx} model, creating new model")
+            logging.info(e)
 
         model.learn(
             total_timesteps=TRAIN_TIMESTEPS,
             tb_log_name=robot_asset_path,
             reset_num_timesteps=False,
         )
-        print(f"Finished training for idx: {idx}")
+        logging.info(f"Finished training for idx: {idx}")
 
         obs = env.reset()
         done = False
@@ -135,7 +132,7 @@ class EndEffectorGA(pygad.GA):
             obs, reward, done, _ = env.step(model.predict(obs)[0])
             total_reward += reward
             if done:
-                print("Resetting env")
+                logging.debug("Resetting env")
                 obs = env.reset()
         fitness = total_reward / TEST_TIMESTEPS
 
@@ -143,45 +140,40 @@ class EndEffectorGA(pygad.GA):
         env.close()
 
         EndEffectorGA.current_gen_fitness[idx] = fitness
-        print(f"Fitness for {idx}: {fitness}")
-        print(f"Total training time {(time() - start_time)/60}min")
-        if idx % 4 == 0:
-            backup_data()
+        logging.info(f"Fitness for {idx}: {fitness}")
+        logging.debug(f"Total training time {(time() - start_time)/60}min")
+
         return fitness
 
 
-def backup_data(ga=None):
+def backup_data(ga):
     dt_string = datetime.now().strftime("%d.%m.%Y-%H:%M:%S")
-    gdrive_path = ""
-    if ga is not None:
-        gdrive_path = (
-            f"/content/gdrive/My Drive/rl_training_v2/{dt_string}_gen_checkpoint"
-        )
-    else:
-        gdrive_path = f"/content/gdrive/My Drive/rl_training_v2/{dt_string}"
+    logging.debug(f"Backing up genetic algorithm at {dt_string}")
+
+    gdrive_path = f"/content/gdrive/My Drive/rl_training_v2/{dt_string}_gen_checkpoint"
     os.mkdir(gdrive_path)
 
     try:
-        if ga is not None:
-            ga.save("mujoco_ga_instance")
-            shutil.copyfile(
-                f"/content/mujoco/mujoco_ga_instance_gen_{ga.generations_completed}.pkl",
-                f"{gdrive_path}/mujoco_ga_instance_gen_{ga.generations_completed}.pkl",
-            )
+        ga.save("mujoco_ga_instance")
+        shutil.copyfile(
+            f"/content/mujoco/mujoco_ga_instance_gen_{ga.generations_completed}.pkl",
+            f"{gdrive_path}/mujoco_ga_instance_gen_{ga.generations_completed}.pkl",
+        )
     except Exception as e:
-        print(f"Could not backup checkpoint GA file: {e}")
+        logging.error(f"Could not backup checkpoint GA file: {e}")
 
     for i in range(8):
         shutil.copyfile(
             f"/content/mujoco/models/end_effector{i}.zip",
             f"{gdrive_path}/end_effector{i}.zip",
         )
+
     shutil.copyfile(
         "/content/mujoco/mujoco_ga_instance.pkl",
         f"{gdrive_path}/mujoco_ga_instance.pkl",
     )
 
-    print(f"Backed up at {gdrive_path}")
+    logging.debug(f"Backed up at {gdrive_path}")
 
 
 if __name__ == "__main__":
@@ -189,12 +181,20 @@ if __name__ == "__main__":
     num_parents_mating = 4
     population_count = 8
 
+    ga: pygad.GA = pygad.load(
+        "/Users/adityapawar/Documents/code/Projects/polygence/models/mujoco_ga_instance_gen_10"
+    )
+
+    ga.plot_fitness()
+
     try:
         ga = pygad.load("mujoco_ga_instance")
-        print(f"Loaded GA instance, generations completed: {ga.generations_completed}")
+        logging.info(
+            f"Loaded GA instance, generations completed: {ga.generations_completed}"
+        )
     except Exception as e:
-        print("Error while loading previous GA instace, creating a new one")
-        print(e)
+        logging.info("Error while loading previous GA instace, creating a new one")
+        logging.info(e)
         ga = EndEffectorGA(
             num_generations,
             num_parents_mating,
@@ -203,14 +203,13 @@ if __name__ == "__main__":
 
     try:
         ga.run()
-    except KeyboardInterrupt as e:
-        print("User stopped GA, saving ga instance")
-        print(e)
+    except KeyboardInterrupt:
+        logging.debug("User stopped GA, saving ga instance")
     finally:
         ga.save("mujoco_ga_instance")
-        backup_data(ga=ga)
+        backup_data(ga)
 
     solution, solution_fitness, solution_idx = ga.best_solution()
-    print(f"Parameters of the best solution : {solution}")
-    print(f"Fitness value of the best solution = {solution_fitness}")
-    print(f"Index of the best solution : {solution_idx}")
+    logging.info(f"Parameters of the best solution : {solution}")
+    logging.info(f"Fitness value of the best solution = {solution_fitness}")
+    logging.info(f"Index of the best solution : {solution_idx}")
