@@ -3,7 +3,8 @@ import shutil
 
 from mujoco_xml.joint import Joint, JointType
 from mujoco_xml.link import Link
-from mujoco_xml.part import Attachment, MuJoCoPart, Position, Size
+from mujoco_xml.part import MuJoCoPart, Position, Size
+from mujoco_xml.part import Rotation
 
 HEADER = """
     <?xml version="1.0" encoding="utf-8"?>
@@ -24,7 +25,6 @@ class EndEffector:
             position=Position.zero(),
             idx=0,
             size=Size.zero(),
-            attachment=Attachment.X,
             friction=1,
             children=[],
         )
@@ -38,7 +38,7 @@ class EndEffector:
         geometry = self.base_link.build_geometry()
         actuator = self.base_link.build_actuator()
 
-        path = os.path.join("robotics", "assets", path)
+        path = os.path.join(os.pardir, "robotics", "assets", path)
         if not os.path.exists(path):
             os.mkdir(path)
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         position=Position(0, 0.01, 0),
         joint_type=JointType.SLIDE,
         size=Size(0.05, 0.015, 0.05),
-        attachment=Attachment.Z,
+        rotation=Rotation.Z,
         friction=1.0,
         children=[],
     )
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         position=Position(0, -0.01, 0),
         joint_type=JointType.SLIDE,
         size=Size(0.05, 0.015, 0.05),
-        attachment=Attachment.Z,
+        rotation=Rotation.Z,
         friction=1.0,
         children=[],
     )
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         position=Position(0, -0.01, 0),
         joint_type=JointType.SLIDE,
         size=Size(0.05, 0.015, 0.05),
-        attachment=Attachment.Z,
+        rotation=Rotation.Z,
         friction=1.0,
         children=[],
     )

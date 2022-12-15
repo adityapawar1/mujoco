@@ -1,0 +1,20 @@
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <mujoco>
+ 
+ 
+            <position ctrllimited="true" ctrlrange="-0.15 0.15" joint="robot0:Base/0/0j" kp="30000" name="robot0:Base/0/0j" user="1"></position>
+        
+            <position ctrllimited="true" ctrlrange="-0.75 0.75" joint="robot0:Base/0/0j/0j" kp="30000" name="robot0:Base/0/0j/0j" user="1"></position>
+        
+            <position ctrllimited="true" ctrlrange="-0.75 0.75" joint="robot0:Base/0/0j/0j/0j" kp="30000" name="robot0:Base/0/0j/0j/0j" user="1"></position>
+        
+
+            <position ctrllimited="true" ctrlrange="-0.75 0.75" joint="robot0:Base/0/1j" kp="30000" name="robot0:Base/0/1j" user="1"></position>
+        
+            <position ctrllimited="true" ctrlrange="-0.75 0.75" joint="robot0:Base/0/1j/0j" kp="30000" name="robot0:Base/0/1j/0j" user="1"></position>
+        
+            <position ctrllimited="true" ctrlrange="-0.15 0.15" joint="robot0:Base/0/1j/0j/0j" kp="30000" name="robot0:Base/0/1j/0j/0j" user="1"></position>
+         
+ 
+    </mujoco>

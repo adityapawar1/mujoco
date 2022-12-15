@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 
-from mujoco_xml.part import MuJoCoPart, Attachment
+from mujoco_xml.part import MuJoCoPart, Rotation
 
 
 class JointType(Enum):
@@ -16,6 +16,7 @@ class Joint(MuJoCoPart):
     """Defines a MuJoCo Joint"""
 
     range: float
+    rotation: Rotation
     joint_type: JointType
     parent: MuJoCoPart = None
     idx: int = 0
@@ -31,26 +32,14 @@ class Joint(MuJoCoPart):
         self.parent = parent
         self.idx = idx
 
-    def find_attachment_position(self):
-        """Creates the attachment attribute coordinates based on the plane of attachment"""
-        if self.parent is not None:
-            if self.attachment == Attachment.X:
-                return f"{self.parent.size.x} 0 0"
-            elif self.attachment == Attachment.Y:
-                return f"0 {self.parent.size.y} 0"
-            elif self.attachment == Attachment.Z:
-                return f"0 0 {self.parent.size.z}"
-        else:
-            return "0 0 0"
-
     def build_geometry(self) -> str:
         """Creates the geometry XML for this joint"""
         child_geometry = "\n".join([child.build_geometry() for child in self.children])
 
         return f"""
-            <body childclass="robot0:{self.joint_type.value}" name="{self.name()}" pos="{self.find_attachment_position()}">
+            <body childclass="robot0:{self.joint_type.value}" name="{self.name()}" pos="{self.position.to_attribute()}">
                 <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
-                <joint axis="0 -1 0" name="robot0:{self.name()}" range="{-self.range} {self.range}"></joint>
+                <joint axis="{Rotation.to_attribute(self.rotation)}" name="robot0:{self.name()}" range="{-self.range} {self.range}"></joint>
                 <geom pos="{self.position.to_attribute()}" size="{self.size.to_attribute()}" type="box" name="robot0:{self.name()}" material="robot0:gripper_finger_mat" condim="4" friction="{self.friction} {self.friction} {self.friction}"></geom>
                 {child_geometry}
             </body>

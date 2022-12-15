@@ -2,11 +2,19 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
-# Which axis the object will be attached too
-class Attachment(Enum):
+class Rotation(Enum):
     X = 0
     Y = 1
     Z = 2
+
+    @staticmethod
+    def to_attribute(rotation):
+        if rotation == Rotation.X:
+            return "1 0 0"
+        if rotation == Rotation.Y:
+            return "0 1 0"
+        if rotation == Rotation.Z:
+            return "0 0 1"
 
 
 @dataclass()
@@ -39,7 +47,6 @@ class Position(Vector3):
 @dataclass()
 class MuJoCoPart:
     size: Size
-    attachment: Attachment
     friction: float
     position: Position
     children: list

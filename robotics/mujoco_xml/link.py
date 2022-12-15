@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from mujoco_xml.part import MuJoCoPart, Attachment
+from mujoco_xml.part import MuJoCoPart
 
 
 @dataclass()
@@ -23,24 +23,12 @@ class Link(MuJoCoPart):
         self.parent = parent
         self.idx = idx
 
-    def find_attachment_position(self):
-        """Creates the attachment attribute coordinates based on the plane of attachment"""
-        if self.parent is not None:
-            if self.attachment == Attachment.X:
-                return f"{self.parent.size.x} 0 0"
-            elif self.attachment == Attachment.Y:
-                return f"0 {self.parent.size.y} 0"
-            elif self.attachment == Attachment.Z:
-                return f"0 0 {self.parent.size.z}"
-        else:
-            return "0 0 0"
-
     def build_geometry(self) -> str:
         """Creates the geometry XML for this link"""
         child_geometry = "\n".join([child.build_geometry() for child in self.children])
 
         return f"""
-            <body childclass="robot0:link" name="{self.name()}" pos="{self.find_attachment_position()}">
+            <body childclass="robot0:link" name="{self.name()}" pos="{self.position.to_attribute()}">
                 <inertial diaginertia="0.1 0.1 0.1" mass="4" pos="-0.01 0 0"></inertial>
                 <geom pos="{self.position.x} {self.position.y} {self.position.z}" size="{self.size.x} {self.size.y} {self.size.z}" type="box" name="robot0:{self.name()}" material="robot0:gripper_finger_mat" condim="4" friction="{self.friction} {self.friction} {self.friction}"></geom>
                 {child_geometry}
