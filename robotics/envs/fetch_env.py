@@ -67,7 +67,7 @@ class FetchEnv(robot_env.RobotEnv):
     # ----------------------------
 
     def compute_reward(self, achieved_goal, gripper, info):
-        # Compute distance between goal and the achieved goal.
+        # Difference in Z
         d = gripper[2] - achieved_goal[2]
 
         if self.reward_type == "sparse":
@@ -77,7 +77,7 @@ class FetchEnv(robot_env.RobotEnv):
             # The higher, the better
             # We want it to pick up the object
             # Subtracting adds when we negate it again
-            d -= gripper[2] * 0.3
+            d -= gripper[2] * 0.1
 
         return -d
 
@@ -163,6 +163,7 @@ class FetchEnv(robot_env.RobotEnv):
             achieved_goal = grip_pos.copy()
         else:
             achieved_goal = np.squeeze(object_pos.copy())
+
         obs = np.concatenate(
             [
                 grip_pos,
@@ -236,11 +237,15 @@ class FetchEnv(robot_env.RobotEnv):
             goal += self.target_offset
             goal[2] = self.height_offset
             if self.target_in_the_air:
-                goal[2] += self.np_random.uniform(0.15, 0.45)
+                goal[2] += self.np_random.uniform(0.10, 0.20)
         else:
             goal = self.initial_gripper_xpos[:3] + self.np_random.uniform(
                 -self.target_range, self.target_range, size=3
             )
+
+        grip_pos = self.sim.data.get_site_xpos("robot0:grip")
+        goal = np.array([grip_pos[0], grip_pos[1], goal[2]])
+
         return goal.copy()
 
     def _is_success(self, achieved_goal, desired_goal):

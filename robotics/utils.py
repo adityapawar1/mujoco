@@ -1,24 +1,48 @@
 import numpy as np
+from numpy.linalg import cholesky
 
 from end_effector import EndEffector
 from mujoco_xml.joint import Joint, JointType
 from mujoco_xml.part import Position, Size
 from mujoco_xml.part import Rotation
 
+LEFT_PARENT_POSITION = Position(0, 0.03, 0)
+RIGHT_PARENT_POSITION = Position(0, -0.03, 0)
+
+
+def normalize_chromosome(chromosome):
+    """Adds empty sizes to the parent joints so the chromosome can be split easily"""
+    chromosome = np.array(chromosome)
+    copy = chromosome.copy()
+
+    sides = np.split(copy, 2)
+    right_side = sides[0]
+    left_side = sides[1]
+    empty_position = np.array([0, 0, 0])
+
+    return np.concatenate([empty_position, right_side, empty_position, left_side])
+
 
 def chromosome_to_end_effector(chromosome, num_joints):
     """Converts a chromosome to an end effector that can be run in MuJoCo"""
+    # Adds position back to parent joints so it can be split easily
     joints = []
     # First, create all components into parts
-    joints_genes = np.split(chromosome, num_joints)
-    for joint_genes in joints_genes:
+    joints_genes = np.split(normalize_chromosome(chromosome), num_joints)
+    for i, joint_genes in enumerate(joints_genes):
         position = Position(joint_genes[0], joint_genes[1], joint_genes[2])
+        if i == 0:  # Right parent
+            position = RIGHT_PARENT_POSITION
+        elif i == 3:  # Left parent
+            position = LEFT_PARENT_POSITION
+
         joint_type = JointType.HINGE if joint_genes[3] == 2 else JointType.SLIDE
         rotation = [Rotation.X, Rotation.Y, Rotation.Z][int(joint_genes[3])]
         size = Size(joint_genes[4], joint_genes[5], joint_genes[6])
         joint_range = (
-            0.15 if joint_type == JointType.SLIDE else 0.75
+            0.04 if joint_type == JointType.SLIDE else 0.75
         )  # hinge needs more range
+
         joint = Joint(
             range=joint_range,
             position=position,
@@ -31,7 +55,7 @@ def chromosome_to_end_effector(chromosome, num_joints):
         joints.append(joint)
 
     # Second, assign children (TODO: arbitrarily for now)
-    # TODO: generalize for other num_joints (only really works for 9)
+    # TODO: generalize for other num_joints (only really works for multiples of 3)
     base_links = []
     for i in range(0, len(joints), 3):
         j1 = joints[i]

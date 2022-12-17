@@ -1,6 +1,4 @@
 # OPEN AI GYM CODE
-
-
 import os
 import copy
 import numpy as np
@@ -88,12 +86,14 @@ class RobotEnv(gym.GoalEnv):
         self._step_callback()
         obs = self._get_obs()
 
-        done = False
-        info = {
-            "is_success": self._is_success(obs["achieved_goal"], self.goal),
-        }
         gripper_pos = obs["observation"][:3]
-        reward = self.compute_reward(obs["achieved_goal"], gripper_pos, info)
+        reward = self.compute_reward(obs["achieved_goal"], gripper_pos, {})
+
+        is_success = reward > 0.15
+        info = {"is_success": is_success}
+
+        done = is_success
+
         return obs, reward, done, info
 
     def reset(self):

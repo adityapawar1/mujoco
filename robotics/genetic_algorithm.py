@@ -7,6 +7,7 @@ import os
 
 import numpy as np
 import pygad
+from torch import cummax
 import utils
 from stable_baselines3.ppo.ppo import PPO
 
@@ -35,12 +36,20 @@ class EndEffectorGA(pygad.GA):
     [POS X, POS Y, POS Z, JOINT TYPE, SIZE X, SIZE Y, SIZE Z]
     """
 
-    POS_SPACE = {"low": 0.015, "high": 0.040, "step": 0.01}
+    POS_SPACE = {"low": 0.015, "high": 0.030, "step": 0.002}
     SIZE_SPACE = {"low": 0.020, "high": 0.040, "step": 0.005}
     JOINT_TYPE_SPACE = [0, 1, 2]
 
-    SINGLE_JOINT_VARIABLES = [float, float, float, int, float, float, float]
-    SINGLE_JOINT_SPACE = [
+    PARENT_JOINT_VARIABLES = [int, float, float, float]
+    CHILD_JOINT_VARIABLES = [float, float, float, int, float, float, float]
+
+    PARENT_JOINT_SPACE = [
+        JOINT_TYPE_SPACE,
+        SIZE_SPACE,
+        SIZE_SPACE,
+        SIZE_SPACE,
+    ]
+    CHILD_JOINT_SPACE = [
         POS_SPACE,
         POS_SPACE,
         POS_SPACE,
@@ -63,8 +72,18 @@ class EndEffectorGA(pygad.GA):
         )
 
         self.current_gen_fitness = np.zeros((population_count,))
-        gene_type = np.tile(self.SINGLE_JOINT_VARIABLES, NUM_JOINTS).tolist()
-        gene_space = np.tile(self.SINGLE_JOINT_SPACE, NUM_JOINTS).tolist()
+
+        one_side_gene_type = (
+            self.PARENT_JOINT_VARIABLES
+            + np.tile(self.CHILD_JOINT_VARIABLES, NUM_JOINTS // 2 - 1).tolist()
+        )
+        gene_type = np.tile(one_side_gene_type, 2).tolist()
+
+        one_side_gene_space = (
+            self.PARENT_JOINT_SPACE
+            + np.tile(self.CHILD_JOINT_SPACE, NUM_JOINTS // 2 - 1).tolist()
+        )
+        gene_space = np.tile(one_side_gene_space, 2).tolist()
 
         super().__init__(
             num_generations=num_generations,
@@ -93,7 +112,7 @@ class EndEffectorGA(pygad.GA):
     @staticmethod
     def dev_fitness_func(chromosome, idx):
         ga_logger.warning(
-            f"You are using the dev fitness function for {idx=}, make sure this is intentional"
+            f"You are using the dev fitness function for idx={idx}, make sure this is intentional"
         )
         robot_asset_path = f"robot_{idx}"
 
@@ -109,13 +128,21 @@ class EndEffectorGA(pygad.GA):
         env = TrainEnv(robot_asset_path)
 
         n_steps = 1_000
+        cumilitive_reward = 0
         for _ in range(n_steps):
             # Random action
             env.render()
             action = env.action_space.sample()
             obs, reward, done, info = env.step(action)
+            cumilitive_reward += reward
+
             if done:
                 obs = env.reset()
+
+        ga_logger.warning(
+            f"Finished {idx} in the DEV function: fitness = {cumilitive_reward / n_steps} "
+        )
+        return cumilitive_reward / n_steps
 
     @staticmethod
     def fitness_func(chromosome, idx):
@@ -215,20 +242,29 @@ def backup_data(ga):
 
 
 if __name__ == "__main__":
+    load_existing_ga = False
     num_generations = 10
     num_parents_mating = 4
     population_count = 8
 
-    try:
-        raise Exception
+    if load_existing_ga:
+        try:
 
-        ga = pygad.load("mujoco_ga_instance")
-        ga_logger.info(
-            f"Loaded GA instance, generations completed: {ga.generations_completed}"
-        )
-    except Exception as e:
-        ga_logger.info("Error while loading previous GA instace, creating a new one")
-        ga_logger.info(e)
+            ga = pygad.load("mujoco_ga_instance")
+            ga_logger.info(
+                f"Loaded GA instance, generations completed: {ga.generations_completed}"
+            )
+        except Exception as e:
+            ga_logger.info(
+                "Error while loading previous GA instace, creating a new one"
+            )
+            ga_logger.info(e)
+            ga = EndEffectorGA(
+                num_generations,
+                num_parents_mating,
+                population_count,
+            )
+    else:
         ga = EndEffectorGA(
             num_generations,
             num_parents_mating,

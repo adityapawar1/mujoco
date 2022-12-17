@@ -38,21 +38,24 @@ class EndEffector:
         geometry = self.base_link.build_geometry()
         actuator = self.base_link.build_actuator()
 
-        path = os.path.join(os.pardir, "robotics", "assets", path)
-        if not os.path.exists(path):
-            os.mkdir(path)
+        root = os.path.dirname(os.path.abspath(__file__))
+        end_effector_asset_dir = os.path.join(root, "assets", path)
+        if not os.path.exists(end_effector_asset_dir):
+            os.mkdir(end_effector_asset_dir)
 
-            template_xml_path = os.path.join("robotics", "assets", "complete.xml")
-            shutil.copy(template_xml_path, os.path.join(path, "complete.xml"))
+            template_xml_path = os.path.join(root, "assets", "complete.xml")
+            shutil.copy(
+                template_xml_path, os.path.join(end_effector_asset_dir, "complete.xml")
+            )
 
         with open(
-            os.path.join(path, "end_effector_geometry.xml"),
+            os.path.join(end_effector_asset_dir, "end_effector_geometry.xml"),
             "w",
         ) as file:
             file.write(f"{HEADER} \n {geometry} \n {FOOTER}")
 
         with open(
-            os.path.join(path, "end_effector_actuator.xml"),
+            os.path.join(end_effector_asset_dir, "end_effector_actuator.xml"),
             "w",
         ) as file:
             file.write(f"{HEADER} \n {actuator} \n {FOOTER}")
