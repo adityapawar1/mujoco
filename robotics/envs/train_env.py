@@ -6,7 +6,7 @@ from envs import fetch_env
 class TrainEnv(fetch_env.FetchEnv, utils.EzPickle):
     """A class for training a member of the genetic algorithm population"""
 
-    def __init__(self, path: str, reward_type="dense"):
+    def __init__(self, asset_path: str, reward_type="dense"):
         initial_qpos = {
             "robot0:slide0": 0.405,
             "robot0:slide1": 0.48,
@@ -15,7 +15,7 @@ class TrainEnv(fetch_env.FetchEnv, utils.EzPickle):
         }
         fetch_env.FetchEnv.__init__(
             self,
-            os.path.join(path, "complete.xml"),
+            os.path.join(asset_path, "complete.xml"),
             has_object=True,
             block_gripper=False,
             n_substeps=20,
