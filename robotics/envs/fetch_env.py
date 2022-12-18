@@ -74,7 +74,8 @@ class FetchEnv(robot_env.RobotEnv):
                 for a, g, i in zip(achieved_goal, gripper, info)
             ]
 
-        d = gripper[2] - achieved_goal[2]
+        d = goal_distance(gripper, achieved_goal)
+        # d = gripper[2] - achieved_goal[2]
 
         if self.reward_type == "sparse":
             return -(d > self.distance_threshold).astype(np.float32)
