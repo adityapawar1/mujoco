@@ -69,17 +69,11 @@ class FetchEnv(robot_env.RobotEnv):
     def compute_reward(self, achieved_goal, gripper, info):
         # Difference in Z
         if len(achieved_goal) != 3:
-            print("Hi her")
-            print(
-                [
-                    self.compute_reward(a, g, i)
-                    for a, g, i in zip(achieved_goal, gripper, info)
-                ]
-            )
             return [
                 self.compute_reward(a, g, i)
                 for a, g, i in zip(achieved_goal, gripper, info)
             ]
+
         d = gripper[2] - achieved_goal[2]
 
         if self.reward_type == "sparse":
