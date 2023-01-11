@@ -4,6 +4,7 @@ from datetime import datetime
 
 import shutil
 import os
+from Cython.Compiler.Naming import py_version_hex
 
 import numpy as np
 import pygad
@@ -127,11 +128,11 @@ class EndEffectorGA(pygad.GA):
 
         env = TrainEnv(robot_asset_path)
 
-        n_steps = 1_000
+        n_steps = 5_000
         cumilitive_reward = 0
         for _ in range(n_steps):
             # Random action
-            env.render()
+            # env.render()
             action = env.action_space.sample()
             obs, reward, done, info = env.step(action)
             cumilitive_reward += reward
@@ -139,6 +140,7 @@ class EndEffectorGA(pygad.GA):
             if done:
                 obs = env.reset()
 
+        ga_logger.warning(f"{cumilitive_reward=}")
         ga_logger.warning(
             f"Finished {idx} in the DEV function: fitness = {cumilitive_reward / n_steps} "
         )
@@ -242,18 +244,21 @@ def backup_data(ga):
 
 
 if __name__ == "__main__":
-    load_existing_ga = False
+    load_existing_ga = True
     num_generations = 10
     num_parents_mating = 4
     population_count = 8
 
     if load_existing_ga:
         try:
-
-            ga = pygad.load("mujoco_ga_instance")
+            ga: pygad.GA = pygad.load("mujoco_ga_instance")
             ga_logger.info(
                 f"Loaded GA instance, generations completed: {ga.generations_completed}"
             )
+            ga.plot_genes()
+            ga.plot_result()
+            ga.plot_fitness()
+            ga.plot_new_solution_rate()
         except Exception as e:
             ga_logger.info(
                 "Error while loading previous GA instace, creating a new one"

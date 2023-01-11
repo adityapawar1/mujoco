@@ -67,7 +67,6 @@ class FetchEnv(robot_env.RobotEnv):
     # ----------------------------
 
     def compute_reward(self, achieved_goal, gripper, info):
-        # Difference in Z
         if len(achieved_goal) != 3:
             return [
                 self.compute_reward(a, g, i)
@@ -80,13 +79,13 @@ class FetchEnv(robot_env.RobotEnv):
         if self.reward_type == "sparse":
             return -(d > self.distance_threshold).astype(np.float32)
 
+        bonus = 0
         if d < self.distance_threshold:
             # The higher, the better
             # We want it to pick up the object
-            # Subtracting adds when we negate it again
-            d -= gripper[2] * 0.1
+            bonus = gripper[2] * 0.25
 
-        return -d
+        return -d + bonus
 
     # RobotEnv methods
     # ----------------------------

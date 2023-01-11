@@ -28,6 +28,8 @@ def chromosome_to_end_effector(chromosome, num_joints):
     # Adds position back to parent joints so it can be split easily
     joints = []
     # First, create all components into parts
+    print(chromosome)
+    print(normalize_chromosome(chromosome))
     joints_genes = np.split(normalize_chromosome(chromosome), num_joints)
     for i, joint_genes in enumerate(joints_genes):
         position = Position(joint_genes[0], joint_genes[1], joint_genes[2])
@@ -42,6 +44,12 @@ def chromosome_to_end_effector(chromosome, num_joints):
         joint_range = (
             0.04 if joint_type == JointType.SLIDE else 0.75
         )  # hinge needs more range
+
+        # print(f"{i=}")
+        # print(f"position: {joint_genes[0]}, {joint_genes[1]}, {joint_genes[2]}")
+        # print(f"Joint type: {joint_genes[3]}")
+        # print(f"Rotation: {joint_genes[3]}")
+        # print(f"Size {joint_genes[4]}, {joint_genes[5]}, {joint_genes[6]}")
 
         joint = Joint(
             range=joint_range,
