@@ -78,12 +78,14 @@ class FetchEnv(robot_env.RobotEnv):
         d = goal_distance(gripper, achieved_goal)
 
         if self.reward_type == "sparse":
+            object_height = achieved_goal[2]
             proximity_reward = -(d > self.distance_threshold).astype(np.float32)
             control_reward = (
-                (achieved_goal > (0.5 + ground)).astype(np.float32)
+                (object_height > (0.5 + ground)).astype(np.float32)
                 if proximity_reward == 0
                 else 0
             )
+            print(proximity_reward, control_reward)
             return proximity_reward + control_reward
 
         bonus = 0
