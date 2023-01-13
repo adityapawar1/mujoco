@@ -24,7 +24,7 @@ class TrainEnv(fetch_env.FetchEnv, utils.EzPickle):
             target_offset=0.0,
             obj_range=0.15,
             target_range=0.15,
-            distance_threshold=0.08,
+            distance_threshold=0.10,
             initial_qpos=initial_qpos,
             reward_type=reward_type,
             gripper_joints=[
