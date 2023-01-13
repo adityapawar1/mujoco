@@ -67,22 +67,27 @@ class FetchEnv(robot_env.RobotEnv):
     # ----------------------------
 
     def compute_reward(self, achieved_goal, gripper, info):
+        ground = 0.42478
         if len(achieved_goal) != 3:
+            # For HER replay
             return [
                 self.compute_reward(a, g, i)
                 for a, g, i in zip(achieved_goal, gripper, info)
             ]
 
         d = goal_distance(gripper, achieved_goal)
-        # d = gripper[2] - achieved_goal[2]
 
         if self.reward_type == "sparse":
-            return -(d > self.distance_threshold).astype(np.float32)
+            proximity_reward = -(d > self.distance_threshold).astype(np.float32)
+            control_reward = (
+                (achieved_goal > (0.5 + ground)).astype(np.float32)
+                if proximity_reward == 0
+                else 0
+            )
+            return proximity_reward + control_reward
 
         bonus = 0
         if d < self.distance_threshold:
-            # The higher, the better
-            # We want it to pick up the object
             bonus = gripper[2] * 0.25
 
         return -d + bonus
