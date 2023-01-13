@@ -89,7 +89,7 @@ class RobotEnv(gym.GoalEnv):
         gripper_pos = obs["observation"][:3]
         reward = self.compute_reward(obs["achieved_goal"], gripper_pos, {})
 
-        is_success = reward > 0.15
+        is_success = False
         info = {"is_success": is_success}
 
         done = is_success
